@@ -1,0 +1,34 @@
+{
+  "title": "Patch Port",
+  "plural": "Patch Ports",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "panelId": "Panel Id",
+    "portNumber": "Port Number",
+    "connectedCableId": "Connected Cable Id",
+    "polarity": "Polarity",
+    "effectiveTo": "Effective To",
+    "labels": "Labels",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System",
+    "region": "Region"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    }
+  }
+}

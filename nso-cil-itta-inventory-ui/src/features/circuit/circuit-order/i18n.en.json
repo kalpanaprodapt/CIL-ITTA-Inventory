@@ -1,0 +1,43 @@
+{
+  "title": "Circuit Order",
+  "plural": "Circuit Orders",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "circuitId": "Circuit Id",
+    "orderNumber": "Order Number",
+    "orderedOn": "Ordered On",
+    "requestedDate": "Requested Date",
+    "committedDate": "Committed Date",
+    "orderStatus": "Order Status",
+    "effectiveFrom": "Effective From",
+    "effectiveTo": "Effective To",
+    "labels": "Labels",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "orderStatus": {
+      "DRAFT": "Draft",
+      "SUBMITTED": "Submitted",
+      "CONFIRMED": "Confirmed",
+      "DELIVERED": "Delivered",
+      "CANCELLED": "Cancelled"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    }
+  }
+}

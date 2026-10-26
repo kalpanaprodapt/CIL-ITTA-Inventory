@@ -1,0 +1,42 @@
+{
+  "title": "Path Trace",
+  "plural": "Path Traces",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "sourceRef": "Source Ref",
+    "targetRef": "Target Ref",
+    "hopCount": "Hop Count",
+    "totalLatencyMs": "Total Latency Ms",
+    "traceMethod": "Trace Method",
+    "tracedAt": "Traced At",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System",
+    "region": "Region",
+    "owner": "Owner",
+    "criticality": "Criticality"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    },
+    "criticality": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "CRITICAL": "Critical"
+    }
+  }
+}

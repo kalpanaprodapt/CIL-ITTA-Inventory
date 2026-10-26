@@ -1,0 +1,121 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: itta-discovery-slo
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: itta-discovery-slo
+      rules:
+        - alert: ITTADiscoveryJobErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-discovery-service",uri=~"/api/v1/discovery-jobs.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-discovery-service",uri=~"/api/v1/discovery-jobs.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: discovery
+            entity: DiscoveryJob
+          annotations:
+            summary: "Discovery Job API burning error budget"
+            description: "More than 2% of Discovery Job requests failed in the last hour."
+        - alert: ITTADiscoveryJobSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-discovery-service",uri="/api/v1/discovery-jobs"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: discovery
+            entity: DiscoveryJob
+          annotations:
+            summary: "Discovery Job search is slow"
+        - alert: ITTADiscoveryProfileErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-discovery-service",uri=~"/api/v1/discovery-profiles.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-discovery-service",uri=~"/api/v1/discovery-profiles.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: discovery
+            entity: DiscoveryProfile
+          annotations:
+            summary: "Discovery Profile API burning error budget"
+            description: "More than 2% of Discovery Profile requests failed in the last hour."
+        - alert: ITTADiscoveryProfileSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-discovery-service",uri="/api/v1/discovery-profiles"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: discovery
+            entity: DiscoveryProfile
+          annotations:
+            summary: "Discovery Profile search is slow"
+        - alert: ITTADiscoveredAssetErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-discovery-service",uri=~"/api/v1/discovered-assets.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-discovery-service",uri=~"/api/v1/discovered-assets.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: discovery
+            entity: DiscoveredAsset
+          annotations:
+            summary: "Discovered Asset API burning error budget"
+            description: "More than 2% of Discovered Asset requests failed in the last hour."
+        - alert: ITTADiscoveredAssetSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-discovery-service",uri="/api/v1/discovered-assets"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: discovery
+            entity: DiscoveredAsset
+          annotations:
+            summary: "Discovered Asset search is slow"
+        - alert: ITTAReconciliationRuleErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-discovery-service",uri=~"/api/v1/reconciliation-rules.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-discovery-service",uri=~"/api/v1/reconciliation-rules.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: discovery
+            entity: ReconciliationRule
+          annotations:
+            summary: "Reconciliation Rule API burning error budget"
+            description: "More than 2% of Reconciliation Rule requests failed in the last hour."
+        - alert: ITTAReconciliationRuleSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-discovery-service",uri="/api/v1/reconciliation-rules"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: discovery
+            entity: ReconciliationRule
+          annotations:
+            summary: "Reconciliation Rule search is slow"
+        - alert: ITTAReconciliationResultErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-discovery-service",uri=~"/api/v1/reconciliation-results.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-discovery-service",uri=~"/api/v1/reconciliation-results.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: discovery
+            entity: ReconciliationResult
+          annotations:
+            summary: "Reconciliation Result API burning error budget"
+            description: "More than 2% of Reconciliation Result requests failed in the last hour."
+        - alert: ITTAReconciliationResultSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-discovery-service",uri="/api/v1/reconciliation-results"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: discovery
+            entity: ReconciliationResult
+          annotations:
+            summary: "Reconciliation Result search is slow"

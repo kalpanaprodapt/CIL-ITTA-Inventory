@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: inventory-integration-service-qa
+  namespace: argocd
+  labels:
+    cil.uniti.com/domain: integration
+    cil.uniti.com/environment: qa
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: itta-inventory-qa
+  source:
+    repoURL: https://dev.azure.com/uniti-cil/CIL/_git/nso-cil-itta-inventory-platform
+    targetRevision: main
+    path: gitops/qa/inventory-integration-service
+  destination:
+    server: https://aks-cil-nonprod-eus2.hcp.eastus2.azmk8s.io:443
+    namespace: itta-inventory-qa
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
+      - ServerSideApply=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 3m
+  revisionHistoryLimit: 5

@@ -1,0 +1,35 @@
+{
+  "title": "Ip Address",
+  "plural": "Ip Addresss",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "subnetId": "Subnet Id",
+    "address": "Address",
+    "assignedToId": "Assigned To Id",
+    "assignmentType": "Assignment Type",
+    "dnsName": "Dns Name",
+    "costCenter": "Cost Center",
+    "notes": "Notes",
+    "effectiveFrom": "Effective From",
+    "effectiveTo": "Effective To",
+    "labels": "Labels"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "assignmentType": {
+      "STATIC": "Static",
+      "DHCP": "Dhcp",
+      "RESERVED": "Reserved",
+      "ANYCAST": "Anycast"
+    }
+  }
+}

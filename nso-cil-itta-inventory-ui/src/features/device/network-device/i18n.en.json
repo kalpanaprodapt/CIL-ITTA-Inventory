@@ -1,0 +1,45 @@
+{
+  "title": "Network Device",
+  "plural": "Network Devices",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "hostname": "Hostname",
+    "deviceRole": "Device Role",
+    "mgmtIp": "Mgmt Ip",
+    "serialNumber": "Serial Number",
+    "modelId": "Model Id",
+    "rackUnitId": "Rack Unit Id",
+    "effectiveTo": "Effective To",
+    "labels": "Labels",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System",
+    "region": "Region"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "deviceRole": {
+      "CORE": "Core",
+      "EDGE": "Edge",
+      "AGG": "Agg",
+      "ACCESS": "Access",
+      "CPE": "Cpe",
+      "FIREWALL": "Firewall",
+      "LB": "Lb"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    }
+  }
+}

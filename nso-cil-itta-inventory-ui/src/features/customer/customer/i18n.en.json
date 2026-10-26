@@ -1,0 +1,36 @@
+{
+  "title": "Customer",
+  "plural": "Customers",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "legalName": "Legal Name",
+    "segment": "Segment",
+    "taxId": "Tax Id",
+    "industry": "Industry",
+    "accountManager": "Account Manager",
+    "costCenter": "Cost Center",
+    "notes": "Notes",
+    "effectiveFrom": "Effective From",
+    "effectiveTo": "Effective To",
+    "labels": "Labels"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "segment": {
+      "ENTERPRISE": "Enterprise",
+      "WHOLESALE": "Wholesale",
+      "GOVERNMENT": "Government",
+      "CARRIER": "Carrier",
+      "SMB": "Smb"
+    }
+  }
+}

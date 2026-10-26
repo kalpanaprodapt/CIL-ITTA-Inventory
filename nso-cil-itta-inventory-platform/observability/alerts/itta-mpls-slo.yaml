@@ -1,0 +1,121 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: itta-mpls-slo
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: itta-mpls-slo
+      rules:
+        - alert: ITTAMplsLspErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-mpls-service",uri=~"/api/v1/mpls-lsps.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-mpls-service",uri=~"/api/v1/mpls-lsps.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: mpls
+            entity: MplsLsp
+          annotations:
+            summary: "Mpls Lsp API burning error budget"
+            description: "More than 2% of Mpls Lsp requests failed in the last hour."
+        - alert: ITTAMplsLspSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-mpls-service",uri="/api/v1/mpls-lsps"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: mpls
+            entity: MplsLsp
+          annotations:
+            summary: "Mpls Lsp search is slow"
+        - alert: ITTAVpnServiceErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-mpls-service",uri=~"/api/v1/vpn-services.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-mpls-service",uri=~"/api/v1/vpn-services.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: mpls
+            entity: VpnService
+          annotations:
+            summary: "Vpn Service API burning error budget"
+            description: "More than 2% of Vpn Service requests failed in the last hour."
+        - alert: ITTAVpnServiceSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-mpls-service",uri="/api/v1/vpn-services"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: mpls
+            entity: VpnService
+          annotations:
+            summary: "Vpn Service search is slow"
+        - alert: ITTAPseudoWireErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-mpls-service",uri=~"/api/v1/pseudo-wires.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-mpls-service",uri=~"/api/v1/pseudo-wires.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: mpls
+            entity: PseudoWire
+          annotations:
+            summary: "Pseudo Wire API burning error budget"
+            description: "More than 2% of Pseudo Wire requests failed in the last hour."
+        - alert: ITTAPseudoWireSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-mpls-service",uri="/api/v1/pseudo-wires"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: mpls
+            entity: PseudoWire
+          annotations:
+            summary: "Pseudo Wire search is slow"
+        - alert: ITTATunnelEndpointErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-mpls-service",uri=~"/api/v1/tunnel-endpoints.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-mpls-service",uri=~"/api/v1/tunnel-endpoints.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: mpls
+            entity: TunnelEndpoint
+          annotations:
+            summary: "Tunnel Endpoint API burning error budget"
+            description: "More than 2% of Tunnel Endpoint requests failed in the last hour."
+        - alert: ITTATunnelEndpointSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-mpls-service",uri="/api/v1/tunnel-endpoints"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: mpls
+            entity: TunnelEndpoint
+          annotations:
+            summary: "Tunnel Endpoint search is slow"
+        - alert: ITTAQosPolicyErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-mpls-service",uri=~"/api/v1/qos-policies.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-mpls-service",uri=~"/api/v1/qos-policies.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: mpls
+            entity: QosPolicy
+          annotations:
+            summary: "Qos Policy API burning error budget"
+            description: "More than 2% of Qos Policy requests failed in the last hour."
+        - alert: ITTAQosPolicySlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-mpls-service",uri="/api/v1/qos-policies"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: mpls
+            entity: QosPolicy
+          annotations:
+            summary: "Qos Policy search is slow"

@@ -1,0 +1,35 @@
+{
+  "title": "Webhook Subscription",
+  "plural": "Webhook Subscriptions",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "callbackUrl": "Callback Url",
+    "eventTypes": "Event Types",
+    "secretRef": "Secret Ref",
+    "active": "Active",
+    "retryLimit": "Retry Limit",
+    "labels": "Labels",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System",
+    "region": "Region",
+    "owner": "Owner"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    }
+  }
+}

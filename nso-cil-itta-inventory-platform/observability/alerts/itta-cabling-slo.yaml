@@ -1,0 +1,121 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: itta-cabling-slo
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: itta-cabling-slo
+      rules:
+        - alert: ITTACableErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-cabling-service",uri=~"/api/v1/cables.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-cabling-service",uri=~"/api/v1/cables.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: cabling
+            entity: Cable
+          annotations:
+            summary: "Cable API burning error budget"
+            description: "More than 2% of Cable requests failed in the last hour."
+        - alert: ITTACableSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-cabling-service",uri="/api/v1/cables"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: cabling
+            entity: Cable
+          annotations:
+            summary: "Cable search is slow"
+        - alert: ITTAPatchPanelErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-cabling-service",uri=~"/api/v1/patch-panels.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-cabling-service",uri=~"/api/v1/patch-panels.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: cabling
+            entity: PatchPanel
+          annotations:
+            summary: "Patch Panel API burning error budget"
+            description: "More than 2% of Patch Panel requests failed in the last hour."
+        - alert: ITTAPatchPanelSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-cabling-service",uri="/api/v1/patch-panels"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: cabling
+            entity: PatchPanel
+          annotations:
+            summary: "Patch Panel search is slow"
+        - alert: ITTAPatchPortErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-cabling-service",uri=~"/api/v1/patch-ports.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-cabling-service",uri=~"/api/v1/patch-ports.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: cabling
+            entity: PatchPort
+          annotations:
+            summary: "Patch Port API burning error budget"
+            description: "More than 2% of Patch Port requests failed in the last hour."
+        - alert: ITTAPatchPortSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-cabling-service",uri="/api/v1/patch-ports"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: cabling
+            entity: PatchPort
+          annotations:
+            summary: "Patch Port search is slow"
+        - alert: ITTASpliceErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-cabling-service",uri=~"/api/v1/splices.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-cabling-service",uri=~"/api/v1/splices.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: cabling
+            entity: Splice
+          annotations:
+            summary: "Splice API burning error budget"
+            description: "More than 2% of Splice requests failed in the last hour."
+        - alert: ITTASpliceSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-cabling-service",uri="/api/v1/splices"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: cabling
+            entity: Splice
+          annotations:
+            summary: "Splice search is slow"
+        - alert: ITTAFiberStrandErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-cabling-service",uri=~"/api/v1/fiber-strands.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-cabling-service",uri=~"/api/v1/fiber-strands.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: cabling
+            entity: FiberStrand
+          annotations:
+            summary: "Fiber Strand API burning error budget"
+            description: "More than 2% of Fiber Strand requests failed in the last hour."
+        - alert: ITTAFiberStrandSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-cabling-service",uri="/api/v1/fiber-strands"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: cabling
+            entity: FiberStrand
+          annotations:
+            summary: "Fiber Strand search is slow"

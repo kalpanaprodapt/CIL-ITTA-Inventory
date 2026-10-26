@@ -1,0 +1,14 @@
+# Variable template for stage
+variables:
+  environment: stage
+  namespace: itta-inventory-stage
+  cluster: aks-cil-stage-eus2
+  region: eastus2
+  subscription: sub-cil-prod
+  keyVault: kv-cil-itta-stage
+  acr: acruniticilitta.azurecr.io
+  argocdServer: argocd.stage.cil.uniti.internal
+  smokeBaseDomain: inventory.stage.cil.uniti.internal
+  replicaFloor: 2
+  replicaCeiling: 6
+  approvalGroup: cil-itta-stage-approvers

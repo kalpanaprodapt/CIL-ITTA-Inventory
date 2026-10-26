@@ -1,0 +1,40 @@
+{
+  "title": "Customer Account",
+  "plural": "Customer Accounts",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "customerId": "Customer Id",
+    "accountNumber": "Account Number",
+    "billingCycle": "Billing Cycle",
+    "currency": "Currency",
+    "creditLimit": "Credit Limit",
+    "effectiveFrom": "Effective From",
+    "effectiveTo": "Effective To",
+    "labels": "Labels",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "billingCycle": {
+      "MONTHLY": "Monthly",
+      "QUARTERLY": "Quarterly",
+      "ANNUAL": "Annual"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    }
+  }
+}

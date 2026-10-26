@@ -1,0 +1,11 @@
+subscription_id    = "sub-cil-nonprod"
+location           = "eastus2"
+environment        = "uat"
+address_space      = "10.42.0.0/16"
+kubernetes_version = "1.30.4"
+alert_email        = "cil-itta-platform@uniti.internal"
+postgres_sku       = "GP_Standard_D4ds_v5"
+postgres_ha        = false
+eventhub_capacity  = 2
+apps_min           = 4
+apps_max           = 10

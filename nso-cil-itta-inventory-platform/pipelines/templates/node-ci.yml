@@ -1,0 +1,26 @@
+parameters:
+  - name: repoName
+    type: string
+  - name: sonarProject
+    type: string
+
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '20.x'
+  - task: Cache@2
+    inputs:
+      key: 'npm | "$(Agent.OS)" | package-lock.json'
+      path: $(Pipeline.Workspace)/.npm
+  - script: npm ci --cache $(Pipeline.Workspace)/.npm
+    displayName: Install
+  - script: npm run typecheck
+    displayName: Type check
+  - script: npm test -- --reporter=junit --outputFile=junit.xml
+    displayName: Unit tests
+  - script: npm run build
+    displayName: Build
+  - task: PublishTestResults@2
+    condition: succeededOrFailed()
+    inputs:
+      testResultsFiles: junit.xml

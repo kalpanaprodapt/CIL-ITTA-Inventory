@@ -1,0 +1,14 @@
+# Variable template for uat
+variables:
+  environment: uat
+  namespace: itta-inventory-uat
+  cluster: aks-cil-nonprod-eus2
+  region: eastus2
+  subscription: sub-cil-nonprod
+  keyVault: kv-cil-itta-uat
+  acr: acruniticilitta.azurecr.io
+  argocdServer: argocd.uat.cil.uniti.internal
+  smokeBaseDomain: inventory.uat.cil.uniti.internal
+  replicaFloor: 2
+  replicaCeiling: 4
+  approvalGroup: cil-itta-uat-approvers

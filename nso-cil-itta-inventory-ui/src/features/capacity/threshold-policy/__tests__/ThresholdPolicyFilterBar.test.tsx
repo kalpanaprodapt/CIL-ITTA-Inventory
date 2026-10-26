@@ -1,0 +1,61 @@
+import { fireEvent, render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+import { ThresholdPolicyFilterBar } from '../ThresholdPolicyFilterBar';
+import type { ThresholdPolicyFilter } from '../types';
+
+function setup(value: ThresholdPolicyFilter = {}) {
+  const onChange = vi.fn();
+  const onReset = vi.fn();
+  render(<ThresholdPolicyFilterBar value={value} onChange={onChange} onReset={onReset} />);
+  return { onChange, onReset };
+}
+
+const CASES: [string, string, Record<string, unknown>][] = [
+    ['Code filter', 'abc', { code: 'abc' }],
+    ['Name filter', 'abc', { name: 'abc' }],
+    ['External Ref filter', 'abc', { externalRef: 'abc' }],
+    ['Policy Name filter', 'abc', { policyName: 'abc' }],
+    ['Metric filter', 'abc', { metric: 'abc' }],
+    ['Warn Pct minimum', '5', { warnPctMin: 5 }],
+    ['Crit Pct minimum', '5', { critPctMin: 5 }],
+    ['Evaluation Window Minutes minimum', '5', { evaluationWindowMinutesMin: 5 }],
+    ['Region filter', 'abc', { region: 'abc' }],
+    ['Owner filter', 'abc', { owner: 'abc' }],
+    ['Cost Center filter', 'abc', { costCenter: 'abc' }],
+];
+
+describe('ThresholdPolicyFilterBar', () => {
+  it('is labelled for assistive technology', () => {
+    setup();
+    expect(screen.getByRole('form', { name: 'Threshold Policy filters' })).toBeInTheDocument();
+  });
+
+  it('emits free text search', () => {
+    const { onChange } = setup();
+    fireEvent.change(screen.getByLabelText('Search Threshold Policy'), { target: { value: 'core' } });
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ q: 'core' }));
+  });
+
+  it('clears q when emptied', () => {
+    const { onChange } = setup({ q: 'core' });
+    fireEvent.change(screen.getByLabelText('Search Threshold Policy'), { target: { value: '' } });
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ q: undefined }));
+  });
+
+  it('offers all lifecycle statuses', () => {
+    setup();
+    expect((screen.getByLabelText('Status filter') as HTMLSelectElement).options).toHaveLength(4);
+  });
+
+  it('calls onReset', () => {
+    const { onReset } = setup({ q: 'x' });
+    fireEvent.click(screen.getByRole('button', { name: 'Reset filters' }));
+    expect(onReset).toHaveBeenCalled();
+  });
+
+  it.each(CASES)('emits a patch when %s changes', (label, value, patch) => {
+    const { onChange } = setup();
+    fireEvent.change(screen.getByLabelText(label), { target: { value } });
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining(patch));
+  });
+});

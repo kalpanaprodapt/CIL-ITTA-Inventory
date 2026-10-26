@@ -1,0 +1,37 @@
+parameters:
+  - name: environment
+    type: string
+  - name: serviceConnection
+    type: string
+  - name: apply
+    type: boolean
+    default: false
+
+steps:
+  - task: TerraformInstaller@1
+    inputs:
+      terraformVersion: 1.9.5
+  - task: TerraformTaskV4@4
+    displayName: init
+    inputs:
+      provider: azurerm
+      command: init
+      workingDirectory: infra/terraform/envs/${{ parameters.environment }}
+      backendServiceArm: ${{ parameters.serviceConnection }}
+  - task: TerraformTaskV4@4
+    displayName: plan
+    inputs:
+      provider: azurerm
+      command: plan
+      workingDirectory: infra/terraform/envs/${{ parameters.environment }}
+      environmentServiceNameAzureRM: ${{ parameters.serviceConnection }}
+      commandOptions: -out=tfplan -input=false
+  - ${{ if eq(parameters.apply, true) }}:
+    - task: TerraformTaskV4@4
+      displayName: apply
+      inputs:
+        provider: azurerm
+        command: apply
+        workingDirectory: infra/terraform/envs/${{ parameters.environment }}
+        environmentServiceNameAzureRM: ${{ parameters.serviceConnection }}
+        commandOptions: tfplan

@@ -1,0 +1,74 @@
+# Helm values for inventory-ui in uat
+nameOverride: inventory-ui
+kind: ui
+domain: ui
+environment: uat
+namespace: itta-inventory-uat
+
+image:
+  repository: acruniticilitta.azurecr.io/itta/inventory-ui
+  tag: 1.0.0-uat
+  pullPolicy: IfNotPresent
+
+replicaCount: 2
+
+service:
+  type: ClusterIP
+  port: 8080
+  targetPort: 8080
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 250m
+    memory: 128Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 4
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+probes:
+  startup: /healthz
+  liveness: /healthz
+  readiness: /healthz
+
+env:
+  - name: API_UPSTREAM_PREFIX
+    value: "https://api-gateway.inventory.uat.cil.uniti.internal"
+  - name: RUNTIME_ENV
+    value: "uat"
+
+ingress:
+  enabled: true
+  className: nginx
+  host: inventory.uat.cil.uniti.internal
+  tlsSecret: inventory-ui-tls
+  clusterIssuer: letsencrypt-staging
+
+serviceMonitor:
+  enabled: false
+  interval: 30s
+
+workloadIdentity:
+  clientId: "11306869-0000-4000-8000-202483155600"
+
+keyVault:
+  name: kv-cil-itta-uat
+  secrets:
+    - itta-ui-db-password
+    - itta-eventhub-connection
+    - itta-aad-client-secret
+
+cluster:
+  name: aks-cil-nonprod-eus2
+  region: eastus2
+  subscription: sub-cil-nonprod

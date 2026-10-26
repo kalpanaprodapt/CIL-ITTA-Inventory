@@ -1,0 +1,36 @@
+{
+  "title": "Country",
+  "plural": "Countrys",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "isoCode": "Iso Code",
+    "isoNumeric": "Iso Numeric",
+    "dialCode": "Dial Code",
+    "currency": "Currency",
+    "regulatoryBody": "Regulatory Body",
+    "timezone": "Timezone",
+    "region": "Region",
+    "owner": "Owner",
+    "criticality": "Criticality",
+    "costCenter": "Cost Center",
+    "notes": "Notes"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "criticality": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "CRITICAL": "Critical"
+    }
+  }
+}

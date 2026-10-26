@@ -1,0 +1,36 @@
+{
+  "title": "Discovery Profile",
+  "plural": "Discovery Profiles",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "profileName": "Profile Name",
+    "protocol": "Protocol",
+    "credentialRef": "Credential Ref",
+    "scopeCidr": "Scope Cidr",
+    "scheduleCron": "Schedule Cron",
+    "costCenter": "Cost Center",
+    "notes": "Notes",
+    "effectiveFrom": "Effective From",
+    "effectiveTo": "Effective To",
+    "labels": "Labels"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "protocol": {
+      "SNMP": "Snmp",
+      "SSH": "Ssh",
+      "NETCONF": "Netconf",
+      "GNMI": "Gnmi",
+      "REST": "Rest"
+    }
+  }
+}

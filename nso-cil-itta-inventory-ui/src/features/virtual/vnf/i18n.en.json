@@ -1,0 +1,42 @@
+{
+  "title": "Vnf",
+  "plural": "Vnfs",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "vnfName": "Vnf Name",
+    "vnfType": "Vnf Type",
+    "flavor": "Flavor",
+    "vcpu": "Vcpu",
+    "memoryGb": "Memory Gb",
+    "instanceCount": "Instance Count",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System",
+    "region": "Region",
+    "owner": "Owner",
+    "criticality": "Criticality"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    },
+    "criticality": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "CRITICAL": "Critical"
+    }
+  }
+}

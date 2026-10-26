@@ -1,0 +1,105 @@
+# CI pipeline for inventory-ui
+name: $(Date:yyyyMMdd)$(Rev:.r)
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - main
+      - release/*
+  paths:
+    include:
+      - src/*
+      - package.json
+      - package-lock.json
+
+pr:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - src/*
+      - package.json
+      - package-lock.json
+
+resources:
+  repositories:
+    - repository: source
+      type: git
+      name: CIL/nso-cil-itta-inventory-ui
+      ref: refs/heads/main
+    - repository: platform
+      type: git
+      name: CIL/nso-cil-itta-inventory-platform
+      ref: refs/heads/main
+
+variables:
+  - group: itta-inventory-shared
+  - name: workload
+    value: inventory-ui
+  - name: imageRepository
+    value: itta/inventory-ui
+  - name: acr
+    value: acruniticilitta.azurecr.io
+
+stages:
+  - stage: Build
+    displayName: Build and test inventory-ui
+    jobs:
+      - job: BuildTest
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - checkout: source
+      - template: templates/node-ci.yml
+        parameters:
+          repoName: nso-cil-itta-inventory-ui
+          sonarProject: cil-itta-inventory-ui
+  - stage: Image
+    displayName: Build and push image
+    dependsOn: Build
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    jobs:
+      - job: Docker
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - checkout: source
+          - checkout: platform
+          - template: templates/docker-build.yml@platform
+            parameters:
+              workload: inventory-ui
+              dockerfile: docker/inventory-ui/Dockerfile
+              context: source
+              acrServiceConnection: sc-acr-cil-itta
+  - stage: Scan
+    displayName: Image and dependency scan
+    dependsOn: Image
+    jobs:
+      - job: Trivy
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - template: templates/security-scan.yml@platform
+            parameters:
+              image: $(acr)/$(imageRepository):$(Build.BuildNumber)
+  - stage: Handoff
+    displayName: Trigger release pipeline
+    dependsOn: Scan
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    jobs:
+      - job: Tag
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - checkout: platform
+            persistCredentials: true
+          - bash: |
+              set -euo pipefail
+              sed -i "s|^  tag: .*|  tag: $(Build.BuildNumber)|" helm/values/dev/inventory-ui.yaml
+              git config user.email "pipeline@uniti.internal"
+              git config user.name "cil-itta-pipeline"
+              git commit -am "chore(inventory-ui): bump dev image to $(Build.BuildNumber)" || echo "nothing to commit"
+              git push origin HEAD:main
+            displayName: Bump dev image tag

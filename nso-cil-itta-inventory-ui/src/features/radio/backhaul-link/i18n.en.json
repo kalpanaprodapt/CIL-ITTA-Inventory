@@ -1,0 +1,34 @@
+{
+  "title": "Backhaul Link",
+  "plural": "Backhaul Links",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "baseStationId": "Base Station Id",
+    "linkMedium": "Link Medium",
+    "capacityMbps": "Capacity Mbps",
+    "latencyMs": "Latency Ms",
+    "circuitRef": "Circuit Ref",
+    "costCenter": "Cost Center",
+    "notes": "Notes",
+    "effectiveFrom": "Effective From",
+    "effectiveTo": "Effective To",
+    "labels": "Labels"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "linkMedium": {
+      "FIBER": "Fiber",
+      "MICROWAVE": "Microwave",
+      "SATELLITE": "Satellite"
+    }
+  }
+}

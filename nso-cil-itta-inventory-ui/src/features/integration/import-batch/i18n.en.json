@@ -1,0 +1,43 @@
+{
+  "title": "Import Batch",
+  "plural": "Import Batchs",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "fileName": "File Name",
+    "entityType": "Entity Type",
+    "totalRows": "Total Rows",
+    "processedRows": "Processed Rows",
+    "failedRows": "Failed Rows",
+    "batchState": "Batch State",
+    "effectiveFrom": "Effective From",
+    "effectiveTo": "Effective To",
+    "labels": "Labels",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "batchState": {
+      "UPLOADED": "Uploaded",
+      "VALIDATING": "Validating",
+      "LOADING": "Loading",
+      "DONE": "Done",
+      "FAILED": "Failed"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    }
+  }
+}

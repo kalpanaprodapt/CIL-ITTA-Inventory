@@ -1,0 +1,41 @@
+{
+  "title": "Splice",
+  "plural": "Splices",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "enclosureId": "Enclosure Id",
+    "aStrandId": "A Strand Id",
+    "zStrandId": "Z Strand Id",
+    "lossDb": "Loss Db",
+    "splicedOn": "Spliced On",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System",
+    "region": "Region",
+    "owner": "Owner",
+    "criticality": "Criticality"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    },
+    "criticality": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "CRITICAL": "Critical"
+    }
+  }
+}

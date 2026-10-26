@@ -1,0 +1,40 @@
+{
+  "title": "Service Endpoint",
+  "plural": "Service Endpoints",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "serviceId": "Service Id",
+    "siteId": "Site Id",
+    "portId": "Port Id",
+    "endpointRole": "Endpoint Role",
+    "handoff": "Handoff",
+    "notes": "Notes",
+    "effectiveFrom": "Effective From",
+    "effectiveTo": "Effective To",
+    "labels": "Labels",
+    "lifecycleStage": "Lifecycle Stage"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "endpointRole": {
+      "HUB": "Hub",
+      "SPOKE": "Spoke",
+      "PEER": "Peer"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    }
+  }
+}

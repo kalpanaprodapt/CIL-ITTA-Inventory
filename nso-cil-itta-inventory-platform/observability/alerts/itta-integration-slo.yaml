@@ -1,0 +1,121 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: itta-integration-slo
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: itta-integration-slo
+      rules:
+        - alert: ITTAIntegrationEndpointErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-integration-service",uri=~"/api/v1/integration-endpoints.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-integration-service",uri=~"/api/v1/integration-endpoints.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: integration
+            entity: IntegrationEndpoint
+          annotations:
+            summary: "Integration Endpoint API burning error budget"
+            description: "More than 2% of Integration Endpoint requests failed in the last hour."
+        - alert: ITTAIntegrationEndpointSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-integration-service",uri="/api/v1/integration-endpoints"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: integration
+            entity: IntegrationEndpoint
+          annotations:
+            summary: "Integration Endpoint search is slow"
+        - alert: ITTASyncJobErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-integration-service",uri=~"/api/v1/sync-jobs.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-integration-service",uri=~"/api/v1/sync-jobs.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: integration
+            entity: SyncJob
+          annotations:
+            summary: "Sync Job API burning error budget"
+            description: "More than 2% of Sync Job requests failed in the last hour."
+        - alert: ITTASyncJobSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-integration-service",uri="/api/v1/sync-jobs"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: integration
+            entity: SyncJob
+          annotations:
+            summary: "Sync Job search is slow"
+        - alert: ITTASyncMappingErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-integration-service",uri=~"/api/v1/sync-mappings.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-integration-service",uri=~"/api/v1/sync-mappings.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: integration
+            entity: SyncMapping
+          annotations:
+            summary: "Sync Mapping API burning error budget"
+            description: "More than 2% of Sync Mapping requests failed in the last hour."
+        - alert: ITTASyncMappingSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-integration-service",uri="/api/v1/sync-mappings"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: integration
+            entity: SyncMapping
+          annotations:
+            summary: "Sync Mapping search is slow"
+        - alert: ITTAImportBatchErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-integration-service",uri=~"/api/v1/import-batchs.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-integration-service",uri=~"/api/v1/import-batchs.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: integration
+            entity: ImportBatch
+          annotations:
+            summary: "Import Batch API burning error budget"
+            description: "More than 2% of Import Batch requests failed in the last hour."
+        - alert: ITTAImportBatchSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-integration-service",uri="/api/v1/import-batchs"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: integration
+            entity: ImportBatch
+          annotations:
+            summary: "Import Batch search is slow"
+        - alert: ITTAWebhookSubscriptionErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-integration-service",uri=~"/api/v1/webhook-subscriptions.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-integration-service",uri=~"/api/v1/webhook-subscriptions.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: integration
+            entity: WebhookSubscription
+          annotations:
+            summary: "Webhook Subscription API burning error budget"
+            description: "More than 2% of Webhook Subscription requests failed in the last hour."
+        - alert: ITTAWebhookSubscriptionSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-integration-service",uri="/api/v1/webhook-subscriptions"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: integration
+            entity: WebhookSubscription
+          annotations:
+            summary: "Webhook Subscription search is slow"

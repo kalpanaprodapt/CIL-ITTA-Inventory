@@ -1,0 +1,121 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: itta-switching-slo
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: itta-switching-slo
+      rules:
+        - alert: ITTAVlanErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-switching-service",uri=~"/api/v1/vlans.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-switching-service",uri=~"/api/v1/vlans.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: switching
+            entity: Vlan
+          annotations:
+            summary: "Vlan API burning error budget"
+            description: "More than 2% of Vlan requests failed in the last hour."
+        - alert: ITTAVlanSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-switching-service",uri="/api/v1/vlans"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: switching
+            entity: Vlan
+          annotations:
+            summary: "Vlan search is slow"
+        - alert: ITTAVlanPoolErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-switching-service",uri=~"/api/v1/vlan-pools.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-switching-service",uri=~"/api/v1/vlan-pools.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: switching
+            entity: VlanPool
+          annotations:
+            summary: "Vlan Pool API burning error budget"
+            description: "More than 2% of Vlan Pool requests failed in the last hour."
+        - alert: ITTAVlanPoolSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-switching-service",uri="/api/v1/vlan-pools"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: switching
+            entity: VlanPool
+          annotations:
+            summary: "Vlan Pool search is slow"
+        - alert: ITTARouteTargetErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-switching-service",uri=~"/api/v1/route-targets.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-switching-service",uri=~"/api/v1/route-targets.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: switching
+            entity: RouteTarget
+          annotations:
+            summary: "Route Target API burning error budget"
+            description: "More than 2% of Route Target requests failed in the last hour."
+        - alert: ITTARouteTargetSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-switching-service",uri="/api/v1/route-targets"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: switching
+            entity: RouteTarget
+          annotations:
+            summary: "Route Target search is slow"
+        - alert: ITTABgpSessionErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-switching-service",uri=~"/api/v1/bgp-sessions.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-switching-service",uri=~"/api/v1/bgp-sessions.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: switching
+            entity: BgpSession
+          annotations:
+            summary: "Bgp Session API burning error budget"
+            description: "More than 2% of Bgp Session requests failed in the last hour."
+        - alert: ITTABgpSessionSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-switching-service",uri="/api/v1/bgp-sessions"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: switching
+            entity: BgpSession
+          annotations:
+            summary: "Bgp Session search is slow"
+        - alert: ITTAOspfAreaErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-switching-service",uri=~"/api/v1/ospf-areas.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-switching-service",uri=~"/api/v1/ospf-areas.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: switching
+            entity: OspfArea
+          annotations:
+            summary: "Ospf Area API burning error budget"
+            description: "More than 2% of Ospf Area requests failed in the last hour."
+        - alert: ITTAOspfAreaSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-switching-service",uri="/api/v1/ospf-areas"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: switching
+            entity: OspfArea
+          annotations:
+            summary: "Ospf Area search is slow"

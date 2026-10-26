@@ -1,0 +1,41 @@
+{
+  "title": "Mpls Lsp",
+  "plural": "Mpls Lsps",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "lspName": "Lsp Name",
+    "headEndId": "Head End Id",
+    "tailEndId": "Tail End Id",
+    "bandwidthMbps": "Bandwidth Mbps",
+    "setupPriority": "Setup Priority",
+    "pathType": "Path Type",
+    "sourceSystem": "Source System",
+    "region": "Region",
+    "owner": "Owner",
+    "criticality": "Criticality",
+    "costCenter": "Cost Center"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "pathType": {
+      "PRIMARY": "Primary",
+      "SECONDARY": "Secondary",
+      "STANDBY": "Standby"
+    },
+    "criticality": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "CRITICAL": "Critical"
+    }
+  }
+}

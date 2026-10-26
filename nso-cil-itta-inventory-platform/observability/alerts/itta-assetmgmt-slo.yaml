@@ -1,0 +1,121 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: itta-assetmgmt-slo
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: itta-assetmgmt-slo
+      rules:
+        - alert: ITTAAssetErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-assetmgmt-service",uri=~"/api/v1/assets.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-assetmgmt-service",uri=~"/api/v1/assets.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: assetmgmt
+            entity: Asset
+          annotations:
+            summary: "Asset API burning error budget"
+            description: "More than 2% of Asset requests failed in the last hour."
+        - alert: ITTAAssetSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-assetmgmt-service",uri="/api/v1/assets"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: assetmgmt
+            entity: Asset
+          annotations:
+            summary: "Asset search is slow"
+        - alert: ITTAAssetTagErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-assetmgmt-service",uri=~"/api/v1/asset-tags.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-assetmgmt-service",uri=~"/api/v1/asset-tags.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: assetmgmt
+            entity: AssetTag
+          annotations:
+            summary: "Asset Tag API burning error budget"
+            description: "More than 2% of Asset Tag requests failed in the last hour."
+        - alert: ITTAAssetTagSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-assetmgmt-service",uri="/api/v1/asset-tags"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: assetmgmt
+            entity: AssetTag
+          annotations:
+            summary: "Asset Tag search is slow"
+        - alert: ITTAPurchaseOrderErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-assetmgmt-service",uri=~"/api/v1/purchase-orders.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-assetmgmt-service",uri=~"/api/v1/purchase-orders.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: assetmgmt
+            entity: PurchaseOrder
+          annotations:
+            summary: "Purchase Order API burning error budget"
+            description: "More than 2% of Purchase Order requests failed in the last hour."
+        - alert: ITTAPurchaseOrderSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-assetmgmt-service",uri="/api/v1/purchase-orders"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: assetmgmt
+            entity: PurchaseOrder
+          annotations:
+            summary: "Purchase Order search is slow"
+        - alert: ITTAInvoiceErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-assetmgmt-service",uri=~"/api/v1/invoices.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-assetmgmt-service",uri=~"/api/v1/invoices.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: assetmgmt
+            entity: Invoice
+          annotations:
+            summary: "Invoice API burning error budget"
+            description: "More than 2% of Invoice requests failed in the last hour."
+        - alert: ITTAInvoiceSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-assetmgmt-service",uri="/api/v1/invoices"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: assetmgmt
+            entity: Invoice
+          annotations:
+            summary: "Invoice search is slow"
+        - alert: ITTADepreciationScheduleErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-assetmgmt-service",uri=~"/api/v1/depreciation-schedules.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-assetmgmt-service",uri=~"/api/v1/depreciation-schedules.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: assetmgmt
+            entity: DepreciationSchedule
+          annotations:
+            summary: "Depreciation Schedule API burning error budget"
+            description: "More than 2% of Depreciation Schedule requests failed in the last hour."
+        - alert: ITTADepreciationScheduleSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-assetmgmt-service",uri="/api/v1/depreciation-schedules"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: assetmgmt
+            entity: DepreciationSchedule
+          annotations:
+            summary: "Depreciation Schedule search is slow"

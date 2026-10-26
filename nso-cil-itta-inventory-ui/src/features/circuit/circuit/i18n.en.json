@@ -1,0 +1,43 @@
+{
+  "title": "Circuit",
+  "plural": "Circuits",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "circuitId": "Circuit Id",
+    "circuitType": "Circuit Type",
+    "bandwidthMbps": "Bandwidth Mbps",
+    "providerId": "Provider Id",
+    "aSiteId": "A Site Id",
+    "zSiteId": "Z Site Id",
+    "labels": "Labels",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System",
+    "region": "Region",
+    "owner": "Owner"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "circuitType": {
+      "ETHERNET": "Ethernet",
+      "WAVELENGTH": "Wavelength",
+      "MPLS": "Mpls",
+      "DIA": "Dia",
+      "TDM": "Tdm"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    }
+  }
+}

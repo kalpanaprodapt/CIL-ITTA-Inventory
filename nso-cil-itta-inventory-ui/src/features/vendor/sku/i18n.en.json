@@ -1,0 +1,35 @@
+{
+  "title": "Sku",
+  "plural": "Skus",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "modelId": "Model Id",
+    "skuCode": "Sku Code",
+    "listPrice": "List Price",
+    "currency": "Currency",
+    "leadTimeDays": "Lead Time Days",
+    "sourceSystem": "Source System",
+    "region": "Region",
+    "owner": "Owner",
+    "criticality": "Criticality",
+    "costCenter": "Cost Center"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "criticality": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "CRITICAL": "Critical"
+    }
+  }
+}

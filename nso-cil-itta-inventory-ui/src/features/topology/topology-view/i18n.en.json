@@ -1,0 +1,41 @@
+{
+  "title": "Topology View",
+  "plural": "Topology Views",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "viewName": "View Name",
+    "viewType": "View Type",
+    "scopeFilter": "Scope Filter",
+    "refreshedAt": "Refreshed At",
+    "effectiveTo": "Effective To",
+    "labels": "Labels",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System",
+    "region": "Region"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "viewType": {
+      "PHYSICAL": "Physical",
+      "L2": "L2",
+      "L3": "L3",
+      "SERVICE": "Service",
+      "OPTICAL": "Optical"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    }
+  }
+}

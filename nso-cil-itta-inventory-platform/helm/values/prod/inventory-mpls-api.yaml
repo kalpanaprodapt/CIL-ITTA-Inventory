@@ -1,0 +1,90 @@
+# Helm values for inventory-mpls-api in prod
+nameOverride: inventory-mpls-api
+kind: python
+domain: mpls
+environment: prod
+namespace: itta-inventory-prod
+
+image:
+  repository: acruniticilitta.azurecr.io/itta/inventory-mpls-api
+  tag: 1.0.0
+  pullPolicy: IfNotPresent
+
+replicaCount: 3
+
+service:
+  type: ClusterIP
+  port: 8080
+  targetPort: 8000
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 384Mi
+  limits:
+    cpu: 2000m
+    memory: 768Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2
+
+probes:
+  startup: /healthz
+  liveness: /healthz
+  readiness: /readyz
+
+env:
+  - name: INVENTORY_MPLS_URL
+    value: "http://inventory-mpls-service.itta-inventory-prod.svc.cluster.local:8080"
+  - name: ITTA_AUTH_ENFORCED
+    value: "true"
+  - name: ITTA_DEFAULT_TENANT
+    value: "uniti"
+  - name: ITTA_LOG_LEVEL
+    value: "WARN"
+  - name: ITTA_UPSTREAM_TIMEOUT
+    value: "10"
+  - name: ITTA_UPSTREAM_RETRIES
+    value: "2"
+  - name: ITTA_CACHE_ENTRIES
+    value: "10000"
+  - name: ITTA_CORS_ORIGINS
+    value: "https://inventory.prod.cil.uniti.internal"
+  - name: AZURE_AD_AUDIENCE
+    value: "api://itta-inventory"
+  - name: WEB_CONCURRENCY
+    value: "4"
+
+ingress:
+  enabled: true
+  className: nginx
+  host: api-mpls.inventory.prod.cil.uniti.internal
+  tlsSecret: inventory-mpls-api-tls
+  clusterIssuer: letsencrypt-prod
+
+serviceMonitor:
+  enabled: true
+  interval: 30s
+
+workloadIdentity:
+  clientId: "19390373-0000-4000-8000-392630307041"
+
+keyVault:
+  name: kv-cil-itta-prod
+  secrets:
+    - itta-mpls-db-password
+    - itta-eventhub-connection
+    - itta-aad-client-secret
+
+cluster:
+  name: aks-cil-prod-eus2
+  region: eastus2
+  subscription: sub-cil-prod

@@ -1,0 +1,121 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: itta-circuit-slo
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: itta-circuit-slo
+      rules:
+        - alert: ITTACircuitErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-circuit-service",uri=~"/api/v1/circuits.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-circuit-service",uri=~"/api/v1/circuits.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: circuit
+            entity: Circuit
+          annotations:
+            summary: "Circuit API burning error budget"
+            description: "More than 2% of Circuit requests failed in the last hour."
+        - alert: ITTACircuitSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-circuit-service",uri="/api/v1/circuits"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: circuit
+            entity: Circuit
+          annotations:
+            summary: "Circuit search is slow"
+        - alert: ITTACircuitSegmentErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-circuit-service",uri=~"/api/v1/circuit-segments.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-circuit-service",uri=~"/api/v1/circuit-segments.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: circuit
+            entity: CircuitSegment
+          annotations:
+            summary: "Circuit Segment API burning error budget"
+            description: "More than 2% of Circuit Segment requests failed in the last hour."
+        - alert: ITTACircuitSegmentSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-circuit-service",uri="/api/v1/circuit-segments"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: circuit
+            entity: CircuitSegment
+          annotations:
+            summary: "Circuit Segment search is slow"
+        - alert: ITTACircuitProviderErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-circuit-service",uri=~"/api/v1/circuit-providers.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-circuit-service",uri=~"/api/v1/circuit-providers.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: circuit
+            entity: CircuitProvider
+          annotations:
+            summary: "Circuit Provider API burning error budget"
+            description: "More than 2% of Circuit Provider requests failed in the last hour."
+        - alert: ITTACircuitProviderSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-circuit-service",uri="/api/v1/circuit-providers"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: circuit
+            entity: CircuitProvider
+          annotations:
+            summary: "Circuit Provider search is slow"
+        - alert: ITTACircuitTerminationErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-circuit-service",uri=~"/api/v1/circuit-terminations.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-circuit-service",uri=~"/api/v1/circuit-terminations.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: circuit
+            entity: CircuitTermination
+          annotations:
+            summary: "Circuit Termination API burning error budget"
+            description: "More than 2% of Circuit Termination requests failed in the last hour."
+        - alert: ITTACircuitTerminationSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-circuit-service",uri="/api/v1/circuit-terminations"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: circuit
+            entity: CircuitTermination
+          annotations:
+            summary: "Circuit Termination search is slow"
+        - alert: ITTACircuitOrderErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-circuit-service",uri=~"/api/v1/circuit-orders.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-circuit-service",uri=~"/api/v1/circuit-orders.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: circuit
+            entity: CircuitOrder
+          annotations:
+            summary: "Circuit Order API burning error budget"
+            description: "More than 2% of Circuit Order requests failed in the last hour."
+        - alert: ITTACircuitOrderSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-circuit-service",uri="/api/v1/circuit-orders"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: circuit
+            entity: CircuitOrder
+          annotations:
+            summary: "Circuit Order search is slow"

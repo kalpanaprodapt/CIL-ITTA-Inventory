@@ -1,0 +1,121 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: itta-device-slo
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: itta-device-slo
+      rules:
+        - alert: ITTANetworkDeviceErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-device-service",uri=~"/api/v1/network-devices.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-device-service",uri=~"/api/v1/network-devices.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: device
+            entity: NetworkDevice
+          annotations:
+            summary: "Network Device API burning error budget"
+            description: "More than 2% of Network Device requests failed in the last hour."
+        - alert: ITTANetworkDeviceSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-device-service",uri="/api/v1/network-devices"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: device
+            entity: NetworkDevice
+          annotations:
+            summary: "Network Device search is slow"
+        - alert: ITTAChassisErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-device-service",uri=~"/api/v1/chassises.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-device-service",uri=~"/api/v1/chassises.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: device
+            entity: Chassis
+          annotations:
+            summary: "Chassis API burning error budget"
+            description: "More than 2% of Chassis requests failed in the last hour."
+        - alert: ITTAChassisSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-device-service",uri="/api/v1/chassises"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: device
+            entity: Chassis
+          annotations:
+            summary: "Chassis search is slow"
+        - alert: ITTALineCardErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-device-service",uri=~"/api/v1/line-cards.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-device-service",uri=~"/api/v1/line-cards.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: device
+            entity: LineCard
+          annotations:
+            summary: "Line Card API burning error budget"
+            description: "More than 2% of Line Card requests failed in the last hour."
+        - alert: ITTALineCardSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-device-service",uri="/api/v1/line-cards"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: device
+            entity: LineCard
+          annotations:
+            summary: "Line Card search is slow"
+        - alert: ITTAPowerSupplyErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-device-service",uri=~"/api/v1/power-supplies.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-device-service",uri=~"/api/v1/power-supplies.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: device
+            entity: PowerSupply
+          annotations:
+            summary: "Power Supply API burning error budget"
+            description: "More than 2% of Power Supply requests failed in the last hour."
+        - alert: ITTAPowerSupplySlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-device-service",uri="/api/v1/power-supplies"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: device
+            entity: PowerSupply
+          annotations:
+            summary: "Power Supply search is slow"
+        - alert: ITTAFanTrayErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-device-service",uri=~"/api/v1/fan-traies.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-device-service",uri=~"/api/v1/fan-traies.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: device
+            entity: FanTray
+          annotations:
+            summary: "Fan Tray API burning error budget"
+            description: "More than 2% of Fan Tray requests failed in the last hour."
+        - alert: ITTAFanTraySlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-device-service",uri="/api/v1/fan-traies"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: device
+            entity: FanTray
+          annotations:
+            summary: "Fan Tray search is slow"

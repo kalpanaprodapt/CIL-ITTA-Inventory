@@ -1,0 +1,41 @@
+{
+  "title": "Reconciliation Rule",
+  "plural": "Reconciliation Rules",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "ruleName": "Rule Name",
+    "matchKey": "Match Key",
+    "action": "Action",
+    "priority": "Priority",
+    "expression": "Expression",
+    "labels": "Labels",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System",
+    "region": "Region",
+    "owner": "Owner"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "action": {
+      "MERGE": "Merge",
+      "CREATE": "Create",
+      "IGNORE": "Ignore",
+      "REVIEW": "Review"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    }
+  }
+}

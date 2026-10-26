@@ -1,0 +1,123 @@
+name: infra-$(Date:yyyyMMdd)$(Rev:.r)
+trigger:
+  branches:
+    include: [ main ]
+  paths:
+    include:
+      - infra/terraform/*
+pr: none
+
+stages:
+  - stage: Infra_dev
+    displayName: Terraform dev
+    
+    jobs:
+      - deployment: tf_dev
+        environment: itta-infra-dev
+        pool:
+          vmImage: ubuntu-latest
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - template: ../templates/terraform.yml
+                  parameters:
+                    environment: dev
+                    serviceConnection: sc-arm-cil-dev
+                    apply: true
+
+  - stage: Infra_qa
+    displayName: Terraform qa
+    dependsOn: Infra_dev
+    jobs:
+      - deployment: tf_qa
+        environment: itta-infra-qa
+        pool:
+          vmImage: ubuntu-latest
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - template: ../templates/terraform.yml
+                  parameters:
+                    environment: qa
+                    serviceConnection: sc-arm-cil-qa
+                    apply: true
+
+  - stage: Infra_uat
+    displayName: Terraform uat
+    dependsOn: Infra_qa
+    jobs:
+      - deployment: tf_uat
+        environment: itta-infra-uat
+        pool:
+          vmImage: ubuntu-latest
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - template: ../templates/terraform.yml
+                  parameters:
+                    environment: uat
+                    serviceConnection: sc-arm-cil-uat
+                    apply: true
+
+  - stage: Infra_perf
+    displayName: Terraform perf
+    dependsOn: Infra_uat
+    jobs:
+      - deployment: tf_perf
+        environment: itta-infra-perf
+        pool:
+          vmImage: ubuntu-latest
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - template: ../templates/terraform.yml
+                  parameters:
+                    environment: perf
+                    serviceConnection: sc-arm-cil-perf
+                    apply: true
+
+  - stage: Infra_stage
+    displayName: Terraform stage
+    dependsOn: Infra_perf
+    jobs:
+      - deployment: tf_stage
+        environment: itta-infra-stage
+        pool:
+          vmImage: ubuntu-latest
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - template: ../templates/terraform.yml
+                  parameters:
+                    environment: stage
+                    serviceConnection: sc-arm-cil-stage
+                    apply: true
+
+  - stage: Infra_prod
+    displayName: Terraform prod
+    dependsOn: Infra_stage
+    jobs:
+      - deployment: tf_prod
+        environment: itta-infra-prod
+        pool:
+          vmImage: ubuntu-latest
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - template: ../templates/terraform.yml
+                  parameters:
+                    environment: prod
+                    serviceConnection: sc-arm-cil-prod
+                    apply: true

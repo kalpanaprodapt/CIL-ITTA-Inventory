@@ -1,0 +1,40 @@
+{
+  "title": "Event Source",
+  "plural": "Event Sources",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "sourceName": "Source Name",
+    "protocol": "Protocol",
+    "endpoint": "Endpoint",
+    "heartbeatSeconds": "Heartbeat Seconds",
+    "labels": "Labels",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System",
+    "region": "Region",
+    "owner": "Owner"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "protocol": {
+      "SNMP_TRAP": "Snmp Trap",
+      "SYSLOG": "Syslog",
+      "KAFKA": "Kafka",
+      "WEBHOOK": "Webhook"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    }
+  }
+}

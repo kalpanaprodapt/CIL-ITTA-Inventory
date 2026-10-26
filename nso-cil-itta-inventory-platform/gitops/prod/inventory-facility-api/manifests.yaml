@@ -1,0 +1,664 @@
+---
+# Source: itta-workload/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: inventory-facility-api
+  namespace: itta-inventory-prod
+  labels:
+    app.kubernetes.io/name: inventory-facility-api
+    app.kubernetes.io/instance: inventory-facility-api-prod
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: facility
+    cil.uniti.com/environment: prod
+  annotations:
+    azure.workload.identity/client-id: "82934881-0000-4000-8000-590654346397"
+    azure.workload.identity/tenant-id: "uniti-cil-tenant"
+automountServiceAccountToken: false
+---
+# Source: itta-workload/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: inventory-facility-api-config
+  namespace: itta-inventory-prod
+  labels:
+    app.kubernetes.io/name: inventory-facility-api
+    app.kubernetes.io/instance: inventory-facility-api-prod
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: facility
+    cil.uniti.com/environment: prod
+data:
+  application-prod.yaml: |
+    itta:
+      domain: facility
+      upstream: http://inventory-facility-service:8080
+      cache:
+        summaries_ttl_seconds: 60
+        item_ttl_seconds: 15
+      entities:
+        - name: Floor
+          path: /api/v1/floors
+          fields: 15
+        - name: Room
+          path: /api/v1/rooms
+          fields: 15
+        - name: Rack
+          path: /api/v1/racks
+          fields: 17
+        - name: RackUnit
+          path: /api/v1/rack-units
+          fields: 15
+        - name: PowerFeed
+          path: /api/v1/power-feeds
+          fields: 17
+      logging:
+        level: WARN
+---
+# Source: itta-workload/templates/secretproviderclass.yaml
+apiVersion: secrets-store.csi.x-k8s.io/v1
+kind: SecretProviderClass
+metadata:
+  name: inventory-facility-api-kv
+  namespace: itta-inventory-prod
+  labels:
+    app.kubernetes.io/name: inventory-facility-api
+    app.kubernetes.io/instance: inventory-facility-api-prod
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: facility
+    cil.uniti.com/environment: prod
+spec:
+  provider: azure
+  parameters:
+    usePodIdentity: "false"
+    clientID: "82934881-0000-4000-8000-590654346397"
+    keyvaultName: kv-cil-itta-prod
+    tenantId: uniti-cil-tenant
+    objects: |
+      array:
+        - |
+          objectName: itta-facility-db-password
+          objectType: secret
+        - |
+          objectName: itta-eventhub-connection
+          objectType: secret
+        - |
+          objectName: itta-aad-client-secret
+          objectType: secret
+  secretObjects:
+    - secretName: inventory-facility-api-secrets
+      type: Opaque
+      data:
+        - objectName: itta-facility-db-password
+          key: db-password
+        - objectName: itta-eventhub-connection
+          key: eventhub-connection
+        - objectName: itta-aad-client-secret
+          key: aad-client-secret
+---
+# Source: itta-workload/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory-facility-api
+  namespace: itta-inventory-prod
+  labels:
+    app.kubernetes.io/name: inventory-facility-api
+    app.kubernetes.io/instance: inventory-facility-api-prod
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: facility
+    cil.uniti.com/environment: prod
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: inventory-facility-api
+    app.kubernetes.io/instance: inventory-facility-api-prod
+---
+# Source: itta-workload/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory-facility-api
+  namespace: itta-inventory-prod
+  labels:
+    app.kubernetes.io/name: inventory-facility-api
+    app.kubernetes.io/instance: inventory-facility-api-prod
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: facility
+    cil.uniti.com/environment: prod
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  replicas: 3
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: inventory-facility-api
+      app.kubernetes.io/instance: inventory-facility-api-prod
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: inventory-facility-api
+        app.kubernetes.io/instance: inventory-facility-api-prod
+        app.kubernetes.io/version: "1.0.0"
+        app.kubernetes.io/component: api
+        app.kubernetes.io/part-of: itta-inventory
+        app.kubernetes.io/managed-by: argocd
+        cil.uniti.com/domain: facility
+        cil.uniti.com/environment: prod
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+        checksum/config: "789082934881"
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+    spec:
+      serviceAccountName: inventory-facility-api
+      terminationGracePeriodSeconds: 45
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: inventory-facility-api
+              app.kubernetes.io/instance: inventory-facility-api-prod
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: inventory-facility-api
+                    app.kubernetes.io/instance: inventory-facility-api-prod
+      containers:
+        - name: inventory-facility-api
+          image: acruniticilitta.azurecr.io/itta/inventory-facility-api:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          env:
+            - name: INVENTORY_FACILITY_URL
+              value: "http://inventory-facility-service.itta-inventory-prod.svc.cluster.local:8080"
+            - name: ITTA_AUTH_ENFORCED
+              value: "true"
+            - name: ITTA_DEFAULT_TENANT
+              value: "uniti"
+            - name: ITTA_LOG_LEVEL
+              value: "WARN"
+            - name: ITTA_UPSTREAM_TIMEOUT
+              value: "10"
+            - name: ITTA_UPSTREAM_RETRIES
+              value: "2"
+            - name: ITTA_CACHE_ENTRIES
+              value: "10000"
+            - name: ITTA_CORS_ORIGINS
+              value: "https://inventory.prod.cil.uniti.internal"
+            - name: AZURE_AD_AUDIENCE
+              value: "api://itta-inventory"
+            - name: WEB_CONCURRENCY
+              value: "4"
+            - name: INVENTORY_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: inventory-facility-api-secrets
+                  key: db-password
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          envFrom:
+            - configMapRef:
+                name: inventory-facility-api-env
+                optional: true
+          resources:
+            requests:
+              cpu: 500m
+              memory: 384Mi
+            limits:
+              cpu: 2000m
+              memory: 768Mi
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+            failureThreshold: 12
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sh", "-c", "sleep 10"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: config
+              mountPath: /config
+              readOnly: true
+            - name: secrets-store
+              mountPath: /mnt/secrets
+              readOnly: true
+      volumes:
+        - name: tmp
+          emptyDir:
+            sizeLimit: 256Mi
+        - name: config
+          configMap:
+            name: inventory-facility-api-config
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: inventory-facility-api-kv
+---
+# Source: itta-workload/templates/hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: inventory-facility-api
+  namespace: itta-inventory-prod
+  labels:
+    app.kubernetes.io/name: inventory-facility-api
+    app.kubernetes.io/instance: inventory-facility-api-prod
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: facility
+    cil.uniti.com/environment: prod
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: inventory-facility-api
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 30
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 60
+---
+# Source: itta-workload/templates/pdb.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: inventory-facility-api
+  namespace: itta-inventory-prod
+  labels:
+    app.kubernetes.io/name: inventory-facility-api
+    app.kubernetes.io/instance: inventory-facility-api-prod
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: facility
+    cil.uniti.com/environment: prod
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: inventory-facility-api
+      app.kubernetes.io/instance: inventory-facility-api-prod
+---
+# Source: itta-workload/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: inventory-facility-api
+  namespace: itta-inventory-prod
+  labels:
+    app.kubernetes.io/name: inventory-facility-api
+    app.kubernetes.io/instance: inventory-facility-api-prod
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: facility
+    cil.uniti.com/environment: prod
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: inventory-facility-api
+      app.kubernetes.io/instance: inventory-facility-api-prod
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: inventory-ui
+              cil.uniti.com/environment: prod
+      ports:
+        - protocol: TCP
+          port: 8000
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: inventory-facility-service
+              cil.uniti.com/environment: prod
+      ports:
+        - protocol: TCP
+          port: 8080
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+      ports:
+        - protocol: TCP
+          port: 443
+---
+# Source: itta-workload/templates/servicemonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: inventory-facility-api
+  namespace: itta-inventory-prod
+  labels:
+    app.kubernetes.io/name: inventory-facility-api
+    app.kubernetes.io/instance: inventory-facility-api-prod
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: facility
+    cil.uniti.com/environment: prod
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: inventory-facility-api
+  namespaceSelector:
+    matchNames:
+      - itta-inventory-prod
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 10s
+      relabelings:
+        - sourceLabels: [__meta_kubernetes_pod_name]
+          targetLabel: pod
+        - targetLabel: environment
+          replacement: prod
+---
+# Source: itta-workload/templates/prometheusrule.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: inventory-facility-api
+  namespace: itta-inventory-prod
+  labels:
+    app.kubernetes.io/name: inventory-facility-api
+    app.kubernetes.io/instance: inventory-facility-api-prod
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: facility
+    cil.uniti.com/environment: prod
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: inventory-facility-api.rules
+      rules:
+        - alert: InventoryFacilityApiHighErrorRate
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-facility-api",status=~"5.."}[5m]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-facility-api"}[5m])) > 0.05
+          for: 10m
+          labels:
+            severity: critical
+            domain: facility
+          annotations:
+            summary: "High 5xx ratio on inventory-facility-api (prod)"
+            runbook_url: "https://wiki.uniti.internal/cil/itta/runbooks/facility"
+        - alert: InventoryFacilityApiPodRestarts
+          expr: increase(kube_pod_container_status_restarts_total{namespace="itta-inventory-prod",pod=~"inventory-facility-api-.*"}[30m]) > 3
+          for: 5m
+          labels:
+            severity: warning
+            domain: facility
+          annotations:
+            summary: "inventory-facility-api pods restarting in prod"
+---
+# Source: itta-workload/templates/cronjob-sync.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: inventory-facility-api-sync
+  namespace: itta-inventory-prod
+  labels:
+    app.kubernetes.io/name: inventory-facility-api
+    app.kubernetes.io/instance: inventory-facility-api-prod
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: facility
+    cil.uniti.com/environment: prod
+    cil.uniti.com/job: reconcile-sync
+spec:
+  schedule: "52 */2 * * *"
+  timeZone: Etc/UTC
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 300
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 5
+  suspend: false
+  jobTemplate:
+    metadata:
+      labels:
+        app.kubernetes.io/name: inventory-facility-api
+        app.kubernetes.io/instance: inventory-facility-api-prod
+        app.kubernetes.io/version: "1.0.0"
+        app.kubernetes.io/component: api
+        app.kubernetes.io/part-of: itta-inventory
+        app.kubernetes.io/managed-by: argocd
+        cil.uniti.com/domain: facility
+        cil.uniti.com/environment: prod
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 1800
+      ttlSecondsAfterFinished: 86400
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: inventory-facility-api
+            app.kubernetes.io/instance: inventory-facility-api-prod
+            app.kubernetes.io/version: "1.0.0"
+            app.kubernetes.io/component: api
+            app.kubernetes.io/part-of: itta-inventory
+            app.kubernetes.io/managed-by: argocd
+            cil.uniti.com/domain: facility
+            cil.uniti.com/environment: prod
+        spec:
+          restartPolicy: Never
+          serviceAccountName: inventory-facility-api
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: sync
+              image: acruniticilitta.azurecr.io/itta/inventory-facility-api:1.0.0
+              imagePullPolicy: IfNotPresent
+              command: ["python", "-m", "itta_core.jobs.reconcile_sync"]
+              args: ["--domain", "facility", "--page-size", "500"]
+              env:
+            - name: INVENTORY_FACILITY_URL
+              value: "http://inventory-facility-service.itta-inventory-prod.svc.cluster.local:8080"
+            - name: ITTA_AUTH_ENFORCED
+              value: "true"
+            - name: ITTA_DEFAULT_TENANT
+              value: "uniti"
+            - name: ITTA_LOG_LEVEL
+              value: "WARN"
+            - name: ITTA_UPSTREAM_TIMEOUT
+              value: "10"
+            - name: ITTA_UPSTREAM_RETRIES
+              value: "2"
+            - name: ITTA_CACHE_ENTRIES
+              value: "10000"
+            - name: ITTA_CORS_ORIGINS
+              value: "https://inventory.prod.cil.uniti.internal"
+            - name: AZURE_AD_AUDIENCE
+              value: "api://itta-inventory"
+            - name: WEB_CONCURRENCY
+              value: "4"
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 500m
+                  memory: 384Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ["ALL"]
+              volumeMounts:
+                - name: tmp
+                  mountPath: /tmp
+          volumes:
+            - name: tmp
+              emptyDir: {}
+---
+# Source: itta-workload/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: inventory-facility-api
+  namespace: itta-inventory-prod
+  labels:
+    app.kubernetes.io/name: inventory-facility-api
+    app.kubernetes.io/instance: inventory-facility-api-prod
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: facility
+    cil.uniti.com/environment: prod
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: 20m
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/enable-cors: "false"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - api-facility.inventory.prod.cil.uniti.internal
+      secretName: inventory-facility-api-tls
+  rules:
+    - host: api-facility.inventory.prod.cil.uniti.internal
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: inventory-facility-api
+                port:
+                  name: http

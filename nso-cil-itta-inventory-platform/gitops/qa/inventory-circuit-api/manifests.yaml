@@ -1,0 +1,642 @@
+---
+# Source: itta-workload/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: inventory-circuit-api
+  namespace: itta-inventory-qa
+  labels:
+    app.kubernetes.io/name: inventory-circuit-api
+    app.kubernetes.io/instance: inventory-circuit-api-qa
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: circuit
+    cil.uniti.com/environment: qa
+  annotations:
+    azure.workload.identity/client-id: "92427477-0000-4000-8000-574559579434"
+    azure.workload.identity/tenant-id: "uniti-cil-tenant"
+automountServiceAccountToken: false
+---
+# Source: itta-workload/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: inventory-circuit-api-config
+  namespace: itta-inventory-qa
+  labels:
+    app.kubernetes.io/name: inventory-circuit-api
+    app.kubernetes.io/instance: inventory-circuit-api-qa
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: circuit
+    cil.uniti.com/environment: qa
+data:
+  application-qa.yaml: |
+    itta:
+      domain: circuit
+      upstream: http://inventory-circuit-service:8080
+      cache:
+        summaries_ttl_seconds: 60
+        item_ttl_seconds: 15
+      entities:
+        - name: Circuit
+          path: /api/v1/circuits
+          fields: 16
+        - name: CircuitSegment
+          path: /api/v1/circuit-segments
+          fields: 15
+        - name: CircuitProvider
+          path: /api/v1/circuit-providers
+          fields: 15
+        - name: CircuitTermination
+          path: /api/v1/circuit-terminations
+          fields: 15
+        - name: CircuitOrder
+          path: /api/v1/circuit-orders
+          fields: 16
+      logging:
+        level: INFO
+---
+# Source: itta-workload/templates/secretproviderclass.yaml
+apiVersion: secrets-store.csi.x-k8s.io/v1
+kind: SecretProviderClass
+metadata:
+  name: inventory-circuit-api-kv
+  namespace: itta-inventory-qa
+  labels:
+    app.kubernetes.io/name: inventory-circuit-api
+    app.kubernetes.io/instance: inventory-circuit-api-qa
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: circuit
+    cil.uniti.com/environment: qa
+spec:
+  provider: azure
+  parameters:
+    usePodIdentity: "false"
+    clientID: "92427477-0000-4000-8000-574559579434"
+    keyvaultName: kv-cil-itta-qa
+    tenantId: uniti-cil-tenant
+    objects: |
+      array:
+        - |
+          objectName: itta-circuit-db-password
+          objectType: secret
+        - |
+          objectName: itta-eventhub-connection
+          objectType: secret
+        - |
+          objectName: itta-aad-client-secret
+          objectType: secret
+  secretObjects:
+    - secretName: inventory-circuit-api-secrets
+      type: Opaque
+      data:
+        - objectName: itta-circuit-db-password
+          key: db-password
+        - objectName: itta-eventhub-connection
+          key: eventhub-connection
+        - objectName: itta-aad-client-secret
+          key: aad-client-secret
+---
+# Source: itta-workload/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory-circuit-api
+  namespace: itta-inventory-qa
+  labels:
+    app.kubernetes.io/name: inventory-circuit-api
+    app.kubernetes.io/instance: inventory-circuit-api-qa
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: circuit
+    cil.uniti.com/environment: qa
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: inventory-circuit-api
+    app.kubernetes.io/instance: inventory-circuit-api-qa
+---
+# Source: itta-workload/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory-circuit-api
+  namespace: itta-inventory-qa
+  labels:
+    app.kubernetes.io/name: inventory-circuit-api
+    app.kubernetes.io/instance: inventory-circuit-api-qa
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: circuit
+    cil.uniti.com/environment: qa
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: inventory-circuit-api
+      app.kubernetes.io/instance: inventory-circuit-api-qa
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: inventory-circuit-api
+        app.kubernetes.io/instance: inventory-circuit-api-qa
+        app.kubernetes.io/version: "1.0.0"
+        app.kubernetes.io/component: api
+        app.kubernetes.io/part-of: itta-inventory
+        app.kubernetes.io/managed-by: argocd
+        cil.uniti.com/domain: circuit
+        cil.uniti.com/environment: qa
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+        checksum/config: "859892427477"
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+    spec:
+      serviceAccountName: inventory-circuit-api
+      terminationGracePeriodSeconds: 45
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: inventory-circuit-api
+              app.kubernetes.io/instance: inventory-circuit-api-qa
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: inventory-circuit-api
+                    app.kubernetes.io/instance: inventory-circuit-api-qa
+      containers:
+        - name: inventory-circuit-api
+          image: acruniticilitta.azurecr.io/itta/inventory-circuit-api:1.0.0-qa
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          env:
+            - name: INVENTORY_CIRCUIT_URL
+              value: "http://inventory-circuit-service.itta-inventory-qa.svc.cluster.local:8080"
+            - name: ITTA_AUTH_ENFORCED
+              value: "false"
+            - name: ITTA_DEFAULT_TENANT
+              value: "uniti"
+            - name: ITTA_LOG_LEVEL
+              value: "INFO"
+            - name: ITTA_UPSTREAM_TIMEOUT
+              value: "10"
+            - name: ITTA_UPSTREAM_RETRIES
+              value: "2"
+            - name: ITTA_CACHE_ENTRIES
+              value: "10000"
+            - name: ITTA_CORS_ORIGINS
+              value: "https://inventory.qa.cil.uniti.internal"
+            - name: AZURE_AD_AUDIENCE
+              value: "api://itta-inventory"
+            - name: WEB_CONCURRENCY
+              value: "2"
+            - name: INVENTORY_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: inventory-circuit-api-secrets
+                  key: db-password
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          envFrom:
+            - configMapRef:
+                name: inventory-circuit-api-env
+                optional: true
+          resources:
+            requests:
+              cpu: 150m
+              memory: 192Mi
+            limits:
+              cpu: 750m
+              memory: 384Mi
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+            failureThreshold: 12
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sh", "-c", "sleep 10"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: config
+              mountPath: /config
+              readOnly: true
+            - name: secrets-store
+              mountPath: /mnt/secrets
+              readOnly: true
+      volumes:
+        - name: tmp
+          emptyDir:
+            sizeLimit: 256Mi
+        - name: config
+          configMap:
+            name: inventory-circuit-api-config
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: inventory-circuit-api-kv
+---
+# Source: itta-workload/templates/hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: inventory-circuit-api
+  namespace: itta-inventory-qa
+  labels:
+    app.kubernetes.io/name: inventory-circuit-api
+    app.kubernetes.io/instance: inventory-circuit-api-qa
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: circuit
+    cil.uniti.com/environment: qa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: inventory-circuit-api
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 30
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 60
+---
+# Source: itta-workload/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: inventory-circuit-api
+  namespace: itta-inventory-qa
+  labels:
+    app.kubernetes.io/name: inventory-circuit-api
+    app.kubernetes.io/instance: inventory-circuit-api-qa
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: circuit
+    cil.uniti.com/environment: qa
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: inventory-circuit-api
+      app.kubernetes.io/instance: inventory-circuit-api-qa
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: inventory-ui
+              cil.uniti.com/environment: qa
+      ports:
+        - protocol: TCP
+          port: 8000
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: inventory-circuit-service
+              cil.uniti.com/environment: qa
+      ports:
+        - protocol: TCP
+          port: 8080
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+      ports:
+        - protocol: TCP
+          port: 443
+---
+# Source: itta-workload/templates/servicemonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: inventory-circuit-api
+  namespace: itta-inventory-qa
+  labels:
+    app.kubernetes.io/name: inventory-circuit-api
+    app.kubernetes.io/instance: inventory-circuit-api-qa
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: circuit
+    cil.uniti.com/environment: qa
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: inventory-circuit-api
+  namespaceSelector:
+    matchNames:
+      - itta-inventory-qa
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 10s
+      relabelings:
+        - sourceLabels: [__meta_kubernetes_pod_name]
+          targetLabel: pod
+        - targetLabel: environment
+          replacement: qa
+---
+# Source: itta-workload/templates/prometheusrule.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: inventory-circuit-api
+  namespace: itta-inventory-qa
+  labels:
+    app.kubernetes.io/name: inventory-circuit-api
+    app.kubernetes.io/instance: inventory-circuit-api-qa
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: circuit
+    cil.uniti.com/environment: qa
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: inventory-circuit-api.rules
+      rules:
+        - alert: InventoryCircuitApiHighErrorRate
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-circuit-api",status=~"5.."}[5m]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-circuit-api"}[5m])) > 0.05
+          for: 10m
+          labels:
+            severity: warning
+            domain: circuit
+          annotations:
+            summary: "High 5xx ratio on inventory-circuit-api (qa)"
+            runbook_url: "https://wiki.uniti.internal/cil/itta/runbooks/circuit"
+        - alert: InventoryCircuitApiPodRestarts
+          expr: increase(kube_pod_container_status_restarts_total{namespace="itta-inventory-qa",pod=~"inventory-circuit-api-.*"}[30m]) > 3
+          for: 5m
+          labels:
+            severity: warning
+            domain: circuit
+          annotations:
+            summary: "inventory-circuit-api pods restarting in qa"
+---
+# Source: itta-workload/templates/cronjob-sync.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: inventory-circuit-api-sync
+  namespace: itta-inventory-qa
+  labels:
+    app.kubernetes.io/name: inventory-circuit-api
+    app.kubernetes.io/instance: inventory-circuit-api-qa
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: circuit
+    cil.uniti.com/environment: qa
+    cil.uniti.com/job: reconcile-sync
+spec:
+  schedule: "37 */6 * * *"
+  timeZone: Etc/UTC
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 300
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 5
+  suspend: true
+  jobTemplate:
+    metadata:
+      labels:
+        app.kubernetes.io/name: inventory-circuit-api
+        app.kubernetes.io/instance: inventory-circuit-api-qa
+        app.kubernetes.io/version: "1.0.0"
+        app.kubernetes.io/component: api
+        app.kubernetes.io/part-of: itta-inventory
+        app.kubernetes.io/managed-by: argocd
+        cil.uniti.com/domain: circuit
+        cil.uniti.com/environment: qa
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 1800
+      ttlSecondsAfterFinished: 86400
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: inventory-circuit-api
+            app.kubernetes.io/instance: inventory-circuit-api-qa
+            app.kubernetes.io/version: "1.0.0"
+            app.kubernetes.io/component: api
+            app.kubernetes.io/part-of: itta-inventory
+            app.kubernetes.io/managed-by: argocd
+            cil.uniti.com/domain: circuit
+            cil.uniti.com/environment: qa
+        spec:
+          restartPolicy: Never
+          serviceAccountName: inventory-circuit-api
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: sync
+              image: acruniticilitta.azurecr.io/itta/inventory-circuit-api:1.0.0-qa
+              imagePullPolicy: IfNotPresent
+              command: ["python", "-m", "itta_core.jobs.reconcile_sync"]
+              args: ["--domain", "circuit", "--page-size", "500"]
+              env:
+            - name: INVENTORY_CIRCUIT_URL
+              value: "http://inventory-circuit-service.itta-inventory-qa.svc.cluster.local:8080"
+            - name: ITTA_AUTH_ENFORCED
+              value: "false"
+            - name: ITTA_DEFAULT_TENANT
+              value: "uniti"
+            - name: ITTA_LOG_LEVEL
+              value: "INFO"
+            - name: ITTA_UPSTREAM_TIMEOUT
+              value: "10"
+            - name: ITTA_UPSTREAM_RETRIES
+              value: "2"
+            - name: ITTA_CACHE_ENTRIES
+              value: "10000"
+            - name: ITTA_CORS_ORIGINS
+              value: "https://inventory.qa.cil.uniti.internal"
+            - name: AZURE_AD_AUDIENCE
+              value: "api://itta-inventory"
+            - name: WEB_CONCURRENCY
+              value: "2"
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 500m
+                  memory: 384Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ["ALL"]
+              volumeMounts:
+                - name: tmp
+                  mountPath: /tmp
+          volumes:
+            - name: tmp
+              emptyDir: {}
+---
+# Source: itta-workload/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: inventory-circuit-api
+  namespace: itta-inventory-qa
+  labels:
+    app.kubernetes.io/name: inventory-circuit-api
+    app.kubernetes.io/instance: inventory-circuit-api-qa
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: circuit
+    cil.uniti.com/environment: qa
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-staging
+    nginx.ingress.kubernetes.io/proxy-body-size: 20m
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/enable-cors: "false"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - api-circuit.inventory.qa.cil.uniti.internal
+      secretName: inventory-circuit-api-tls
+  rules:
+    - host: api-circuit.inventory.qa.cil.uniti.internal
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: inventory-circuit-api
+                port:
+                  name: http

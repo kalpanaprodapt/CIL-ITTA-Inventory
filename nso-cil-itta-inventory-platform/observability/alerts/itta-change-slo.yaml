@@ -1,0 +1,121 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: itta-change-slo
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: itta-change-slo
+      rules:
+        - alert: ITTAChangeRequestErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-change-service",uri=~"/api/v1/change-requests.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-change-service",uri=~"/api/v1/change-requests.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: change
+            entity: ChangeRequest
+          annotations:
+            summary: "Change Request API burning error budget"
+            description: "More than 2% of Change Request requests failed in the last hour."
+        - alert: ITTAChangeRequestSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-change-service",uri="/api/v1/change-requests"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: change
+            entity: ChangeRequest
+          annotations:
+            summary: "Change Request search is slow"
+        - alert: ITTAMaintenanceWindowErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-change-service",uri=~"/api/v1/maintenance-windows.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-change-service",uri=~"/api/v1/maintenance-windows.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: change
+            entity: MaintenanceWindow
+          annotations:
+            summary: "Maintenance Window API burning error budget"
+            description: "More than 2% of Maintenance Window requests failed in the last hour."
+        - alert: ITTAMaintenanceWindowSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-change-service",uri="/api/v1/maintenance-windows"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: change
+            entity: MaintenanceWindow
+          annotations:
+            summary: "Maintenance Window search is slow"
+        - alert: ITTAWorkOrderErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-change-service",uri=~"/api/v1/work-orders.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-change-service",uri=~"/api/v1/work-orders.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: change
+            entity: WorkOrder
+          annotations:
+            summary: "Work Order API burning error budget"
+            description: "More than 2% of Work Order requests failed in the last hour."
+        - alert: ITTAWorkOrderSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-change-service",uri="/api/v1/work-orders"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: change
+            entity: WorkOrder
+          annotations:
+            summary: "Work Order search is slow"
+        - alert: ITTAFieldTaskErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-change-service",uri=~"/api/v1/field-tasks.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-change-service",uri=~"/api/v1/field-tasks.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: change
+            entity: FieldTask
+          annotations:
+            summary: "Field Task API burning error budget"
+            description: "More than 2% of Field Task requests failed in the last hour."
+        - alert: ITTAFieldTaskSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-change-service",uri="/api/v1/field-tasks"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: change
+            entity: FieldTask
+          annotations:
+            summary: "Field Task search is slow"
+        - alert: ITTATechnicianErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-change-service",uri=~"/api/v1/technicians.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-change-service",uri=~"/api/v1/technicians.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: change
+            entity: Technician
+          annotations:
+            summary: "Technician API burning error budget"
+            description: "More than 2% of Technician requests failed in the last hour."
+        - alert: ITTATechnicianSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-change-service",uri="/api/v1/technicians"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: change
+            entity: Technician
+          annotations:
+            summary: "Technician search is slow"

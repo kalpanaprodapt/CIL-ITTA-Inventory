@@ -1,0 +1,40 @@
+{
+  "title": "Maintenance Window",
+  "plural": "Maintenance Windows",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "windowName": "Window Name",
+    "startsAt": "Starts At",
+    "endsAt": "Ends At",
+    "scope": "Scope",
+    "impactLevel": "Impact Level",
+    "effectiveTo": "Effective To",
+    "labels": "Labels",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System",
+    "region": "Region"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "impactLevel": {
+      "NONE": "None",
+      "DEGRADED": "Degraded",
+      "OUTAGE": "Outage"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    }
+  }
+}

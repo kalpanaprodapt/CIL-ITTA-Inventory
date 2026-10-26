@@ -1,0 +1,36 @@
+{
+  "title": "Power Supply",
+  "plural": "Power Supplys",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "chassisId": "Chassis Id",
+    "slotNumber": "Slot Number",
+    "wattage": "Wattage",
+    "feedId": "Feed Id",
+    "serialNumber": "Serial Number",
+    "efficiency": "Efficiency",
+    "criticality": "Criticality",
+    "costCenter": "Cost Center",
+    "notes": "Notes",
+    "effectiveFrom": "Effective From",
+    "effectiveTo": "Effective To"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "criticality": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "CRITICAL": "Critical"
+    }
+  }
+}

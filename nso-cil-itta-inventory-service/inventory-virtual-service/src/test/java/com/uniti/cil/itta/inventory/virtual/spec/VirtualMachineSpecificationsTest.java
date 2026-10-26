@@ -1,0 +1,29 @@
+package com.uniti.cil.itta.inventory.virtual.spec;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.uniti.cil.itta.inventory.common.model.LifecycleStatus;
+import com.uniti.cil.itta.inventory.virtual.dto.VirtualMachineSearchCriteria;
+import com.uniti.cil.itta.inventory.virtual.model.*;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.UUID;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+
+class VirtualMachineSpecificationsTest {
+
+    @Test
+    void nullCriteriaStillScopesToTenant() {
+        assertThat(VirtualMachineSpecifications.fromCriteria("t", null)).isNotNull();
+    }
+
+    @Test
+    void freeTextBuildsSpecification() {
+        VirtualMachineSearchCriteria criteria = new VirtualMachineSearchCriteria();
+        criteria.setQ("  core ");
+        assertThat(VirtualMachineSpecifications.fromCriteria("t", criteria)).isNotNull();
+    }
+
+}

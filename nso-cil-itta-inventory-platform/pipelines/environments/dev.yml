@@ -1,0 +1,14 @@
+# Variable template for dev
+variables:
+  environment: dev
+  namespace: itta-inventory-dev
+  cluster: aks-cil-nonprod-eus2
+  region: eastus2
+  subscription: sub-cil-nonprod
+  keyVault: kv-cil-itta-dev
+  acr: acruniticilitta.azurecr.io
+  argocdServer: argocd.dev.cil.uniti.internal
+  smokeBaseDomain: inventory.dev.cil.uniti.internal
+  replicaFloor: 1
+  replicaCeiling: 2
+  approvalGroup: none

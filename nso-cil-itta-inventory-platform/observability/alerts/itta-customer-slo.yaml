@@ -1,0 +1,121 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: itta-customer-slo
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: itta-customer-slo
+      rules:
+        - alert: ITTACustomerErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-customer-service",uri=~"/api/v1/customers.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-customer-service",uri=~"/api/v1/customers.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: customer
+            entity: Customer
+          annotations:
+            summary: "Customer API burning error budget"
+            description: "More than 2% of Customer requests failed in the last hour."
+        - alert: ITTACustomerSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-customer-service",uri="/api/v1/customers"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: customer
+            entity: Customer
+          annotations:
+            summary: "Customer search is slow"
+        - alert: ITTACustomerAccountErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-customer-service",uri=~"/api/v1/customer-accounts.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-customer-service",uri=~"/api/v1/customer-accounts.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: customer
+            entity: CustomerAccount
+          annotations:
+            summary: "Customer Account API burning error budget"
+            description: "More than 2% of Customer Account requests failed in the last hour."
+        - alert: ITTACustomerAccountSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-customer-service",uri="/api/v1/customer-accounts"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: customer
+            entity: CustomerAccount
+          annotations:
+            summary: "Customer Account search is slow"
+        - alert: ITTACustomerContactErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-customer-service",uri=~"/api/v1/customer-contacts.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-customer-service",uri=~"/api/v1/customer-contacts.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: customer
+            entity: CustomerContact
+          annotations:
+            summary: "Customer Contact API burning error budget"
+            description: "More than 2% of Customer Contact requests failed in the last hour."
+        - alert: ITTACustomerContactSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-customer-service",uri="/api/v1/customer-contacts"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: customer
+            entity: CustomerContact
+          annotations:
+            summary: "Customer Contact search is slow"
+        - alert: ITTAContractErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-customer-service",uri=~"/api/v1/contracts.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-customer-service",uri=~"/api/v1/contracts.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: customer
+            entity: Contract
+          annotations:
+            summary: "Contract API burning error budget"
+            description: "More than 2% of Contract requests failed in the last hour."
+        - alert: ITTAContractSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-customer-service",uri="/api/v1/contracts"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: customer
+            entity: Contract
+          annotations:
+            summary: "Contract search is slow"
+        - alert: ITTASlaProfileErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-customer-service",uri=~"/api/v1/sla-profiles.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-customer-service",uri=~"/api/v1/sla-profiles.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: customer
+            entity: SlaProfile
+          annotations:
+            summary: "Sla Profile API burning error budget"
+            description: "More than 2% of Sla Profile requests failed in the last hour."
+        - alert: ITTASlaProfileSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-customer-service",uri="/api/v1/sla-profiles"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: customer
+            entity: SlaProfile
+          annotations:
+            summary: "Sla Profile search is slow"

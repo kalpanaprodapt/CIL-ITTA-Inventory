@@ -1,0 +1,121 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: itta-radio-slo
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: itta-radio-slo
+      rules:
+        - alert: ITTARadioUnitErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-radio-service",uri=~"/api/v1/radio-units.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-radio-service",uri=~"/api/v1/radio-units.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: radio
+            entity: RadioUnit
+          annotations:
+            summary: "Radio Unit API burning error budget"
+            description: "More than 2% of Radio Unit requests failed in the last hour."
+        - alert: ITTARadioUnitSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-radio-service",uri="/api/v1/radio-units"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: radio
+            entity: RadioUnit
+          annotations:
+            summary: "Radio Unit search is slow"
+        - alert: ITTABaseStationErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-radio-service",uri=~"/api/v1/base-stations.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-radio-service",uri=~"/api/v1/base-stations.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: radio
+            entity: BaseStation
+          annotations:
+            summary: "Base Station API burning error budget"
+            description: "More than 2% of Base Station requests failed in the last hour."
+        - alert: ITTABaseStationSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-radio-service",uri="/api/v1/base-stations"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: radio
+            entity: BaseStation
+          annotations:
+            summary: "Base Station search is slow"
+        - alert: ITTAAntennaErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-radio-service",uri=~"/api/v1/antennas.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-radio-service",uri=~"/api/v1/antennas.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: radio
+            entity: Antenna
+          annotations:
+            summary: "Antenna API burning error budget"
+            description: "More than 2% of Antenna requests failed in the last hour."
+        - alert: ITTAAntennaSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-radio-service",uri="/api/v1/antennas"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: radio
+            entity: Antenna
+          annotations:
+            summary: "Antenna search is slow"
+        - alert: ITTASectorErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-radio-service",uri=~"/api/v1/sectors.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-radio-service",uri=~"/api/v1/sectors.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: radio
+            entity: Sector
+          annotations:
+            summary: "Sector API burning error budget"
+            description: "More than 2% of Sector requests failed in the last hour."
+        - alert: ITTASectorSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-radio-service",uri="/api/v1/sectors"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: radio
+            entity: Sector
+          annotations:
+            summary: "Sector search is slow"
+        - alert: ITTABackhaulLinkErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-radio-service",uri=~"/api/v1/backhaul-links.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-radio-service",uri=~"/api/v1/backhaul-links.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: radio
+            entity: BackhaulLink
+          annotations:
+            summary: "Backhaul Link API burning error budget"
+            description: "More than 2% of Backhaul Link requests failed in the last hour."
+        - alert: ITTABackhaulLinkSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-radio-service",uri="/api/v1/backhaul-links"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: radio
+            entity: BackhaulLink
+          annotations:
+            summary: "Backhaul Link search is slow"

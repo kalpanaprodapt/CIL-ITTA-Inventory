@@ -1,0 +1,40 @@
+{
+  "title": "Depreciation Schedule",
+  "plural": "Depreciation Schedules",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "assetId": "Asset Id",
+    "method": "Method",
+    "usefulLifeMonths": "Useful Life Months",
+    "salvageValue": "Salvage Value",
+    "startDate": "Start Date",
+    "effectiveFrom": "Effective From",
+    "effectiveTo": "Effective To",
+    "labels": "Labels",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "method": {
+      "STRAIGHT_LINE": "Straight Line",
+      "DECLINING": "Declining",
+      "UNITS": "Units"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    }
+  }
+}

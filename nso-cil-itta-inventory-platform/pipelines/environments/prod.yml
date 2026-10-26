@@ -1,0 +1,14 @@
+# Variable template for prod
+variables:
+  environment: prod
+  namespace: itta-inventory-prod
+  cluster: aks-cil-prod-eus2
+  region: eastus2
+  subscription: sub-cil-prod
+  keyVault: kv-cil-itta-prod
+  acr: acruniticilitta.azurecr.io
+  argocdServer: argocd.prod.cil.uniti.internal
+  smokeBaseDomain: inventory.prod.cil.uniti.internal
+  replicaFloor: 3
+  replicaCeiling: 10
+  approvalGroup: cil-itta-prod-approvers

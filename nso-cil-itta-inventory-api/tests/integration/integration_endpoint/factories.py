@@ -1,0 +1,54 @@
+"""Test data builders for Integration Endpoint."""
+from __future__ import annotations
+
+from datetime import date, datetime, timezone
+from decimal import Decimal
+from uuid import UUID
+
+from itta_core.models import LifecycleStatus
+from itta_api.domains.integration.integration_endpoint.schemas import *  # noqa: F401,F403
+
+ID = UUID("11111111-1111-1111-1111-111111111111")
+TENANT = "tenant-a"
+
+
+def create_payload(**overrides) -> IntegrationEndpointCreate:
+    data = dict(
+        code="code-1",
+        name="name-1",
+        description="description-1",
+        status=LifecycleStatus.PLANNED,
+        external_ref="external_ref-1",
+        endpoint_name="endpoint_name-1",
+        target_system="target_system-1",
+        base_url="base_url-1",
+        auth_type=IntegrationEndpointAuthType.BASIC,
+        timeout_ms=11,
+        source_system="source_system-1",
+        region="region-1",
+        owner="owner-1",
+        criticality=IntegrationEndpointCriticality.LOW,
+        cost_center="cost_center-1",
+    )
+    data.update(code="INTEGR-0001", name="Integration Endpoint one", status=LifecycleStatus.ACTIVE)
+    data.update(overrides)
+    return IntegrationEndpointCreate(**data)
+
+
+def read_model(**overrides) -> IntegrationEndpointRead:
+    base = create_payload().model_dump()
+    base.update(id=ID, tenant_id=TENANT, version=0)
+    base.update(overrides)
+    return IntegrationEndpointRead(**base)
+
+
+def raw_record(**overrides) -> dict[str, object]:
+    record = create_payload().model_dump(mode="json", by_alias=True)
+    record.update(overrides)
+    return record
+
+
+def upstream_json(**overrides) -> dict[str, object]:
+    record = read_model().model_dump(mode="json", by_alias=True)
+    record.update(overrides)
+    return record

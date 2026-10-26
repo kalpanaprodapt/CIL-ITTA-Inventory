@@ -1,0 +1,809 @@
+# Local development stack. Start one domain: docker compose --profile device up
+name: itta-inventory
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: itta_inventory
+      POSTGRES_USER: itta
+      POSTGRES_PASSWORD: itta
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U itta -d itta_inventory"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  kafka:
+    image: bitnami/kafka:3.8
+    environment:
+      KAFKA_CFG_NODE_ID: "0"
+      KAFKA_CFG_PROCESS_ROLES: controller,broker
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 0@kafka:9093
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+    ports:
+      - "9092:9092"
+
+  inventory-ui:
+    build:
+      context: ../nso-cil-itta-inventory-ui
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-ui/Dockerfile
+    profiles: ["ui", "all"]
+    ports:
+      - "5173:8080"
+
+  inventory-geography-service:
+    build:
+      context: ../nso-cil-itta-inventory-service
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-geography-service/Dockerfile
+    profiles: ["geography", "all"]
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      INVENTORY_DB_URL: jdbc:postgresql://postgres:5432/itta_inventory
+      INVENTORY_DB_USER: itta
+      INVENTORY_DB_PASSWORD: itta
+      KAFKA_BOOTSTRAP: kafka:9092
+    ports:
+      - "8100:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  inventory-geography-api:
+    build:
+      context: ../nso-cil-itta-inventory-api
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-geography-api/Dockerfile
+    profiles: ["geography", "all"]
+    environment:
+      INVENTORY_GEOGRAPHY_URL: http://inventory-geography-service:8080
+      ITTA_AUTH_ENFORCED: "false"
+    ports:
+      - "8200:8000"
+    depends_on:
+      - inventory-geography-service
+
+  inventory-facility-service:
+    build:
+      context: ../nso-cil-itta-inventory-service
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-facility-service/Dockerfile
+    profiles: ["facility", "all"]
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      INVENTORY_DB_URL: jdbc:postgresql://postgres:5432/itta_inventory
+      INVENTORY_DB_USER: itta
+      INVENTORY_DB_PASSWORD: itta
+      KAFKA_BOOTSTRAP: kafka:9092
+    ports:
+      - "8101:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  inventory-facility-api:
+    build:
+      context: ../nso-cil-itta-inventory-api
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-facility-api/Dockerfile
+    profiles: ["facility", "all"]
+    environment:
+      INVENTORY_FACILITY_URL: http://inventory-facility-service:8080
+      ITTA_AUTH_ENFORCED: "false"
+    ports:
+      - "8201:8000"
+    depends_on:
+      - inventory-facility-service
+
+  inventory-device-service:
+    build:
+      context: ../nso-cil-itta-inventory-service
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-device-service/Dockerfile
+    profiles: ["device", "all"]
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      INVENTORY_DB_URL: jdbc:postgresql://postgres:5432/itta_inventory
+      INVENTORY_DB_USER: itta
+      INVENTORY_DB_PASSWORD: itta
+      KAFKA_BOOTSTRAP: kafka:9092
+    ports:
+      - "8102:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  inventory-device-api:
+    build:
+      context: ../nso-cil-itta-inventory-api
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-device-api/Dockerfile
+    profiles: ["device", "all"]
+    environment:
+      INVENTORY_DEVICE_URL: http://inventory-device-service:8080
+      ITTA_AUTH_ENFORCED: "false"
+    ports:
+      - "8202:8000"
+    depends_on:
+      - inventory-device-service
+
+  inventory-port-service:
+    build:
+      context: ../nso-cil-itta-inventory-service
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-port-service/Dockerfile
+    profiles: ["port", "all"]
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      INVENTORY_DB_URL: jdbc:postgresql://postgres:5432/itta_inventory
+      INVENTORY_DB_USER: itta
+      INVENTORY_DB_PASSWORD: itta
+      KAFKA_BOOTSTRAP: kafka:9092
+    ports:
+      - "8103:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  inventory-port-api:
+    build:
+      context: ../nso-cil-itta-inventory-api
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-port-api/Dockerfile
+    profiles: ["port", "all"]
+    environment:
+      INVENTORY_PORT_URL: http://inventory-port-service:8080
+      ITTA_AUTH_ENFORCED: "false"
+    ports:
+      - "8203:8000"
+    depends_on:
+      - inventory-port-service
+
+  inventory-cabling-service:
+    build:
+      context: ../nso-cil-itta-inventory-service
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-cabling-service/Dockerfile
+    profiles: ["cabling", "all"]
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      INVENTORY_DB_URL: jdbc:postgresql://postgres:5432/itta_inventory
+      INVENTORY_DB_USER: itta
+      INVENTORY_DB_PASSWORD: itta
+      KAFKA_BOOTSTRAP: kafka:9092
+    ports:
+      - "8104:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  inventory-cabling-api:
+    build:
+      context: ../nso-cil-itta-inventory-api
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-cabling-api/Dockerfile
+    profiles: ["cabling", "all"]
+    environment:
+      INVENTORY_CABLING_URL: http://inventory-cabling-service:8080
+      ITTA_AUTH_ENFORCED: "false"
+    ports:
+      - "8204:8000"
+    depends_on:
+      - inventory-cabling-service
+
+  inventory-vendor-service:
+    build:
+      context: ../nso-cil-itta-inventory-service
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-vendor-service/Dockerfile
+    profiles: ["vendor", "all"]
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      INVENTORY_DB_URL: jdbc:postgresql://postgres:5432/itta_inventory
+      INVENTORY_DB_USER: itta
+      INVENTORY_DB_PASSWORD: itta
+      KAFKA_BOOTSTRAP: kafka:9092
+    ports:
+      - "8105:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  inventory-vendor-api:
+    build:
+      context: ../nso-cil-itta-inventory-api
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-vendor-api/Dockerfile
+    profiles: ["vendor", "all"]
+    environment:
+      INVENTORY_VENDOR_URL: http://inventory-vendor-service:8080
+      ITTA_AUTH_ENFORCED: "false"
+    ports:
+      - "8205:8000"
+    depends_on:
+      - inventory-vendor-service
+
+  inventory-software-service:
+    build:
+      context: ../nso-cil-itta-inventory-service
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-software-service/Dockerfile
+    profiles: ["software", "all"]
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      INVENTORY_DB_URL: jdbc:postgresql://postgres:5432/itta_inventory
+      INVENTORY_DB_USER: itta
+      INVENTORY_DB_PASSWORD: itta
+      KAFKA_BOOTSTRAP: kafka:9092
+    ports:
+      - "8106:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  inventory-software-api:
+    build:
+      context: ../nso-cil-itta-inventory-api
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-software-api/Dockerfile
+    profiles: ["software", "all"]
+    environment:
+      INVENTORY_SOFTWARE_URL: http://inventory-software-service:8080
+      ITTA_AUTH_ENFORCED: "false"
+    ports:
+      - "8206:8000"
+    depends_on:
+      - inventory-software-service
+
+  inventory-ipam-service:
+    build:
+      context: ../nso-cil-itta-inventory-service
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-ipam-service/Dockerfile
+    profiles: ["ipam", "all"]
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      INVENTORY_DB_URL: jdbc:postgresql://postgres:5432/itta_inventory
+      INVENTORY_DB_USER: itta
+      INVENTORY_DB_PASSWORD: itta
+      KAFKA_BOOTSTRAP: kafka:9092
+    ports:
+      - "8107:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  inventory-ipam-api:
+    build:
+      context: ../nso-cil-itta-inventory-api
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-ipam-api/Dockerfile
+    profiles: ["ipam", "all"]
+    environment:
+      INVENTORY_IPAM_URL: http://inventory-ipam-service:8080
+      ITTA_AUTH_ENFORCED: "false"
+    ports:
+      - "8207:8000"
+    depends_on:
+      - inventory-ipam-service
+
+  inventory-switching-service:
+    build:
+      context: ../nso-cil-itta-inventory-service
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-switching-service/Dockerfile
+    profiles: ["switching", "all"]
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      INVENTORY_DB_URL: jdbc:postgresql://postgres:5432/itta_inventory
+      INVENTORY_DB_USER: itta
+      INVENTORY_DB_PASSWORD: itta
+      KAFKA_BOOTSTRAP: kafka:9092
+    ports:
+      - "8108:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  inventory-switching-api:
+    build:
+      context: ../nso-cil-itta-inventory-api
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-switching-api/Dockerfile
+    profiles: ["switching", "all"]
+    environment:
+      INVENTORY_SWITCHING_URL: http://inventory-switching-service:8080
+      ITTA_AUTH_ENFORCED: "false"
+    ports:
+      - "8208:8000"
+    depends_on:
+      - inventory-switching-service
+
+  inventory-circuit-service:
+    build:
+      context: ../nso-cil-itta-inventory-service
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-circuit-service/Dockerfile
+    profiles: ["circuit", "all"]
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      INVENTORY_DB_URL: jdbc:postgresql://postgres:5432/itta_inventory
+      INVENTORY_DB_USER: itta
+      INVENTORY_DB_PASSWORD: itta
+      KAFKA_BOOTSTRAP: kafka:9092
+    ports:
+      - "8109:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  inventory-circuit-api:
+    build:
+      context: ../nso-cil-itta-inventory-api
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-circuit-api/Dockerfile
+    profiles: ["circuit", "all"]
+    environment:
+      INVENTORY_CIRCUIT_URL: http://inventory-circuit-service:8080
+      ITTA_AUTH_ENFORCED: "false"
+    ports:
+      - "8209:8000"
+    depends_on:
+      - inventory-circuit-service
+
+  inventory-topology-service:
+    build:
+      context: ../nso-cil-itta-inventory-service
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-topology-service/Dockerfile
+    profiles: ["topology", "all"]
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      INVENTORY_DB_URL: jdbc:postgresql://postgres:5432/itta_inventory
+      INVENTORY_DB_USER: itta
+      INVENTORY_DB_PASSWORD: itta
+      KAFKA_BOOTSTRAP: kafka:9092
+    ports:
+      - "8110:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  inventory-topology-api:
+    build:
+      context: ../nso-cil-itta-inventory-api
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-topology-api/Dockerfile
+    profiles: ["topology", "all"]
+    environment:
+      INVENTORY_TOPOLOGY_URL: http://inventory-topology-service:8080
+      ITTA_AUTH_ENFORCED: "false"
+    ports:
+      - "8210:8000"
+    depends_on:
+      - inventory-topology-service
+
+  inventory-customer-service:
+    build:
+      context: ../nso-cil-itta-inventory-service
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-customer-service/Dockerfile
+    profiles: ["customer", "all"]
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      INVENTORY_DB_URL: jdbc:postgresql://postgres:5432/itta_inventory
+      INVENTORY_DB_USER: itta
+      INVENTORY_DB_PASSWORD: itta
+      KAFKA_BOOTSTRAP: kafka:9092
+    ports:
+      - "8111:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  inventory-customer-api:
+    build:
+      context: ../nso-cil-itta-inventory-api
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-customer-api/Dockerfile
+    profiles: ["customer", "all"]
+    environment:
+      INVENTORY_CUSTOMER_URL: http://inventory-customer-service:8080
+      ITTA_AUTH_ENFORCED: "false"
+    ports:
+      - "8211:8000"
+    depends_on:
+      - inventory-customer-service
+
+  inventory-service-service:
+    build:
+      context: ../nso-cil-itta-inventory-service
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-service-service/Dockerfile
+    profiles: ["service", "all"]
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      INVENTORY_DB_URL: jdbc:postgresql://postgres:5432/itta_inventory
+      INVENTORY_DB_USER: itta
+      INVENTORY_DB_PASSWORD: itta
+      KAFKA_BOOTSTRAP: kafka:9092
+    ports:
+      - "8112:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  inventory-service-api:
+    build:
+      context: ../nso-cil-itta-inventory-api
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-service-api/Dockerfile
+    profiles: ["service", "all"]
+    environment:
+      INVENTORY_SERVICE_URL: http://inventory-service-service:8080
+      ITTA_AUTH_ENFORCED: "false"
+    ports:
+      - "8212:8000"
+    depends_on:
+      - inventory-service-service
+
+  inventory-mpls-service:
+    build:
+      context: ../nso-cil-itta-inventory-service
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-mpls-service/Dockerfile
+    profiles: ["mpls", "all"]
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      INVENTORY_DB_URL: jdbc:postgresql://postgres:5432/itta_inventory
+      INVENTORY_DB_USER: itta
+      INVENTORY_DB_PASSWORD: itta
+      KAFKA_BOOTSTRAP: kafka:9092
+    ports:
+      - "8113:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  inventory-mpls-api:
+    build:
+      context: ../nso-cil-itta-inventory-api
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-mpls-api/Dockerfile
+    profiles: ["mpls", "all"]
+    environment:
+      INVENTORY_MPLS_URL: http://inventory-mpls-service:8080
+      ITTA_AUTH_ENFORCED: "false"
+    ports:
+      - "8213:8000"
+    depends_on:
+      - inventory-mpls-service
+
+  inventory-optical-service:
+    build:
+      context: ../nso-cil-itta-inventory-service
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-optical-service/Dockerfile
+    profiles: ["optical", "all"]
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      INVENTORY_DB_URL: jdbc:postgresql://postgres:5432/itta_inventory
+      INVENTORY_DB_USER: itta
+      INVENTORY_DB_PASSWORD: itta
+      KAFKA_BOOTSTRAP: kafka:9092
+    ports:
+      - "8114:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  inventory-optical-api:
+    build:
+      context: ../nso-cil-itta-inventory-api
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-optical-api/Dockerfile
+    profiles: ["optical", "all"]
+    environment:
+      INVENTORY_OPTICAL_URL: http://inventory-optical-service:8080
+      ITTA_AUTH_ENFORCED: "false"
+    ports:
+      - "8214:8000"
+    depends_on:
+      - inventory-optical-service
+
+  inventory-radio-service:
+    build:
+      context: ../nso-cil-itta-inventory-service
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-radio-service/Dockerfile
+    profiles: ["radio", "all"]
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      INVENTORY_DB_URL: jdbc:postgresql://postgres:5432/itta_inventory
+      INVENTORY_DB_USER: itta
+      INVENTORY_DB_PASSWORD: itta
+      KAFKA_BOOTSTRAP: kafka:9092
+    ports:
+      - "8115:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  inventory-radio-api:
+    build:
+      context: ../nso-cil-itta-inventory-api
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-radio-api/Dockerfile
+    profiles: ["radio", "all"]
+    environment:
+      INVENTORY_RADIO_URL: http://inventory-radio-service:8080
+      ITTA_AUTH_ENFORCED: "false"
+    ports:
+      - "8215:8000"
+    depends_on:
+      - inventory-radio-service
+
+  inventory-virtual-service:
+    build:
+      context: ../nso-cil-itta-inventory-service
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-virtual-service/Dockerfile
+    profiles: ["virtual", "all"]
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      INVENTORY_DB_URL: jdbc:postgresql://postgres:5432/itta_inventory
+      INVENTORY_DB_USER: itta
+      INVENTORY_DB_PASSWORD: itta
+      KAFKA_BOOTSTRAP: kafka:9092
+    ports:
+      - "8116:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  inventory-virtual-api:
+    build:
+      context: ../nso-cil-itta-inventory-api
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-virtual-api/Dockerfile
+    profiles: ["virtual", "all"]
+    environment:
+      INVENTORY_VIRTUAL_URL: http://inventory-virtual-service:8080
+      ITTA_AUTH_ENFORCED: "false"
+    ports:
+      - "8216:8000"
+    depends_on:
+      - inventory-virtual-service
+
+  inventory-discovery-service:
+    build:
+      context: ../nso-cil-itta-inventory-service
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-discovery-service/Dockerfile
+    profiles: ["discovery", "all"]
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      INVENTORY_DB_URL: jdbc:postgresql://postgres:5432/itta_inventory
+      INVENTORY_DB_USER: itta
+      INVENTORY_DB_PASSWORD: itta
+      KAFKA_BOOTSTRAP: kafka:9092
+    ports:
+      - "8117:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  inventory-discovery-api:
+    build:
+      context: ../nso-cil-itta-inventory-api
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-discovery-api/Dockerfile
+    profiles: ["discovery", "all"]
+    environment:
+      INVENTORY_DISCOVERY_URL: http://inventory-discovery-service:8080
+      ITTA_AUTH_ENFORCED: "false"
+    ports:
+      - "8217:8000"
+    depends_on:
+      - inventory-discovery-service
+
+  inventory-change-service:
+    build:
+      context: ../nso-cil-itta-inventory-service
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-change-service/Dockerfile
+    profiles: ["change", "all"]
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      INVENTORY_DB_URL: jdbc:postgresql://postgres:5432/itta_inventory
+      INVENTORY_DB_USER: itta
+      INVENTORY_DB_PASSWORD: itta
+      KAFKA_BOOTSTRAP: kafka:9092
+    ports:
+      - "8118:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  inventory-change-api:
+    build:
+      context: ../nso-cil-itta-inventory-api
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-change-api/Dockerfile
+    profiles: ["change", "all"]
+    environment:
+      INVENTORY_CHANGE_URL: http://inventory-change-service:8080
+      ITTA_AUTH_ENFORCED: "false"
+    ports:
+      - "8218:8000"
+    depends_on:
+      - inventory-change-service
+
+  inventory-assetmgmt-service:
+    build:
+      context: ../nso-cil-itta-inventory-service
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-assetmgmt-service/Dockerfile
+    profiles: ["assetmgmt", "all"]
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      INVENTORY_DB_URL: jdbc:postgresql://postgres:5432/itta_inventory
+      INVENTORY_DB_USER: itta
+      INVENTORY_DB_PASSWORD: itta
+      KAFKA_BOOTSTRAP: kafka:9092
+    ports:
+      - "8119:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  inventory-assetmgmt-api:
+    build:
+      context: ../nso-cil-itta-inventory-api
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-assetmgmt-api/Dockerfile
+    profiles: ["assetmgmt", "all"]
+    environment:
+      INVENTORY_ASSETMGMT_URL: http://inventory-assetmgmt-service:8080
+      ITTA_AUTH_ENFORCED: "false"
+    ports:
+      - "8219:8000"
+    depends_on:
+      - inventory-assetmgmt-service
+
+  inventory-compliance-service:
+    build:
+      context: ../nso-cil-itta-inventory-service
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-compliance-service/Dockerfile
+    profiles: ["compliance", "all"]
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      INVENTORY_DB_URL: jdbc:postgresql://postgres:5432/itta_inventory
+      INVENTORY_DB_USER: itta
+      INVENTORY_DB_PASSWORD: itta
+      KAFKA_BOOTSTRAP: kafka:9092
+    ports:
+      - "8120:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  inventory-compliance-api:
+    build:
+      context: ../nso-cil-itta-inventory-api
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-compliance-api/Dockerfile
+    profiles: ["compliance", "all"]
+    environment:
+      INVENTORY_COMPLIANCE_URL: http://inventory-compliance-service:8080
+      ITTA_AUTH_ENFORCED: "false"
+    ports:
+      - "8220:8000"
+    depends_on:
+      - inventory-compliance-service
+
+  inventory-alarm-service:
+    build:
+      context: ../nso-cil-itta-inventory-service
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-alarm-service/Dockerfile
+    profiles: ["alarm", "all"]
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      INVENTORY_DB_URL: jdbc:postgresql://postgres:5432/itta_inventory
+      INVENTORY_DB_USER: itta
+      INVENTORY_DB_PASSWORD: itta
+      KAFKA_BOOTSTRAP: kafka:9092
+    ports:
+      - "8121:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  inventory-alarm-api:
+    build:
+      context: ../nso-cil-itta-inventory-api
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-alarm-api/Dockerfile
+    profiles: ["alarm", "all"]
+    environment:
+      INVENTORY_ALARM_URL: http://inventory-alarm-service:8080
+      ITTA_AUTH_ENFORCED: "false"
+    ports:
+      - "8221:8000"
+    depends_on:
+      - inventory-alarm-service
+
+  inventory-capacity-service:
+    build:
+      context: ../nso-cil-itta-inventory-service
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-capacity-service/Dockerfile
+    profiles: ["capacity", "all"]
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      INVENTORY_DB_URL: jdbc:postgresql://postgres:5432/itta_inventory
+      INVENTORY_DB_USER: itta
+      INVENTORY_DB_PASSWORD: itta
+      KAFKA_BOOTSTRAP: kafka:9092
+    ports:
+      - "8122:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  inventory-capacity-api:
+    build:
+      context: ../nso-cil-itta-inventory-api
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-capacity-api/Dockerfile
+    profiles: ["capacity", "all"]
+    environment:
+      INVENTORY_CAPACITY_URL: http://inventory-capacity-service:8080
+      ITTA_AUTH_ENFORCED: "false"
+    ports:
+      - "8222:8000"
+    depends_on:
+      - inventory-capacity-service
+
+  inventory-integration-service:
+    build:
+      context: ../nso-cil-itta-inventory-service
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-integration-service/Dockerfile
+    profiles: ["integration", "all"]
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      INVENTORY_DB_URL: jdbc:postgresql://postgres:5432/itta_inventory
+      INVENTORY_DB_USER: itta
+      INVENTORY_DB_PASSWORD: itta
+      KAFKA_BOOTSTRAP: kafka:9092
+    ports:
+      - "8123:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  inventory-integration-api:
+    build:
+      context: ../nso-cil-itta-inventory-api
+      dockerfile: ../nso-cil-itta-inventory-platform/docker/inventory-integration-api/Dockerfile
+    profiles: ["integration", "all"]
+    environment:
+      INVENTORY_INTEGRATION_URL: http://inventory-integration-service:8080
+      ITTA_AUTH_ENFORCED: "false"
+    ports:
+      - "8223:8000"
+    depends_on:
+      - inventory-integration-service
+
+volumes:
+  pgdata: {}

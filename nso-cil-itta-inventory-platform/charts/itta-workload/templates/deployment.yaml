@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "itta.name" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "itta.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "itta.selector" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "itta.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "itta.name" . }}
+      containers:
+        - name: {{ include "itta.name" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+          env:
+            {{- toYaml .Values.env | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          startupProbe:
+            httpGet: { path: {{ .Values.probes.startup }}, port: http }
+          livenessProbe:
+            httpGet: { path: {{ .Values.probes.liveness }}, port: http }
+          readinessProbe:
+            httpGet: { path: {{ .Values.probes.readiness }}, port: http }

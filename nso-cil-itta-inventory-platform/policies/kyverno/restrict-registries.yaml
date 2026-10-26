@@ -1,0 +1,19 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: restrict-image-registries
+spec:
+  validationFailureAction: Enforce
+  rules:
+    - name: only-cil-acr
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaces: ["itta-inventory-*"]
+      validate:
+        message: "Images must come from acruniticilitta.azurecr.io."
+        pattern:
+          spec:
+            containers:
+              - image: "acruniticilitta.azurecr.io/*"

@@ -1,0 +1,35 @@
+{
+  "title": "Alarm Definition",
+  "plural": "Alarm Definitions",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "alarmCode": "Alarm Code",
+    "severity": "Severity",
+    "probableCause": "Probable Cause",
+    "autoClear": "Auto Clear",
+    "costCenter": "Cost Center",
+    "notes": "Notes",
+    "effectiveFrom": "Effective From",
+    "effectiveTo": "Effective To",
+    "labels": "Labels"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "severity": {
+      "INDETERMINATE": "Indeterminate",
+      "WARNING": "Warning",
+      "MINOR": "Minor",
+      "MAJOR": "Major",
+      "CRITICAL": "Critical"
+    }
+  }
+}

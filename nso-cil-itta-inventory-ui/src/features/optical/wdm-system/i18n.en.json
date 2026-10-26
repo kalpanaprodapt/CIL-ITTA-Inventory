@@ -1,0 +1,40 @@
+{
+  "title": "Wdm System",
+  "plural": "Wdm Systems",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "systemName": "System Name",
+    "channelCapacity": "Channel Capacity",
+    "band": "Band",
+    "spanCount": "Span Count",
+    "vendorId": "Vendor Id",
+    "notes": "Notes",
+    "effectiveFrom": "Effective From",
+    "effectiveTo": "Effective To",
+    "labels": "Labels",
+    "lifecycleStage": "Lifecycle Stage"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "band": {
+      "C": "C",
+      "L": "L",
+      "C_L": "C L"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    }
+  }
+}

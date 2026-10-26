@@ -1,0 +1,88 @@
+# Helm values for inventory-integration-service in uat
+nameOverride: inventory-integration-service
+kind: java
+domain: integration
+environment: uat
+namespace: itta-inventory-uat
+
+image:
+  repository: acruniticilitta.azurecr.io/itta/inventory-integration-service
+  tag: 1.0.0-uat
+  pullPolicy: IfNotPresent
+
+replicaCount: 2
+
+service:
+  type: ClusterIP
+  port: 8080
+  targetPort: 8080
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 512Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 4
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+probes:
+  startup: /actuator/health/liveness
+  liveness: /actuator/health/liveness
+  readiness: /actuator/health/readiness
+
+env:
+  - name: SPRING_PROFILES_ACTIVE
+    value: "uat"
+  - name: JAVA_TOOL_OPTIONS
+    value: "-XX:MaxRAMPercentage=75 -XX:+ExitOnOutOfMemoryError -Djava.security.egd=file:/dev/urandom"
+  - name: INVENTORY_DB_URL
+    value: "jdbc:postgresql://pg-cil-itta-uat.postgres.database.azure.com:5432/itta_inventory?sslmode=require"
+  - name: INVENTORY_DB_POOL
+    value: "20"
+  - name: KAFKA_BOOTSTRAP
+    value: "evh-cil-itta-uat.servicebus.windows.net:9093"
+  - name: AZURE_AD_ISSUER
+    value: "https://login.microsoftonline.com/uniti-cil/v2.0"
+  - name: AZURE_AD_AUDIENCE
+    value: "api://itta-inventory"
+  - name: DEFAULT_TENANT
+    value: "uniti"
+  - name: LOG_LEVEL
+    value: "INFO"
+  - name: SERVER_PORT
+    value: "8080"
+  - name: MANAGEMENT_SERVER_PORT
+    value: "8080"
+
+ingress:
+  enabled: false
+
+serviceMonitor:
+  enabled: true
+  interval: 30s
+
+workloadIdentity:
+  clientId: "51901206-0000-4000-8000-882675342785"
+
+keyVault:
+  name: kv-cil-itta-uat
+  secrets:
+    - itta-integration-db-password
+    - itta-eventhub-connection
+    - itta-aad-client-secret
+
+cluster:
+  name: aks-cil-nonprod-eus2
+  region: eastus2
+  subscription: sub-cil-nonprod

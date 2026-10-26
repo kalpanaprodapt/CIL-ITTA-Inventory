@@ -1,0 +1,29 @@
+{
+  "title": "Pseudo Wire",
+  "plural": "Pseudo Wires",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "vcId": "Vc Id",
+    "aEndId": "A End Id",
+    "zEndId": "Z End Id",
+    "encapsulation": "Encapsulation",
+    "controlWord": "Control Word",
+    "costCenter": "Cost Center",
+    "notes": "Notes",
+    "effectiveFrom": "Effective From",
+    "effectiveTo": "Effective To",
+    "labels": "Labels"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    }
+  }
+}

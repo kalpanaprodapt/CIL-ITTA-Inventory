@@ -1,0 +1,20 @@
+# perf profile overrides
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 40
+  jpa:
+    show-sql: false
+  kafka:
+    producer:
+      properties:
+        linger.ms: 20
+        compression.type: lz4
+
+inventory:
+  security:
+    enforce-roles: false
+
+logging:
+  level:
+    com.uniti.cil.itta.inventory: WARN

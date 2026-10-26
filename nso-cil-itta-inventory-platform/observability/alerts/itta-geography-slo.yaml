@@ -1,0 +1,121 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: itta-geography-slo
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: itta-geography-slo
+      rules:
+        - alert: ITTACountryErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-geography-service",uri=~"/api/v1/countries.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-geography-service",uri=~"/api/v1/countries.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: geography
+            entity: Country
+          annotations:
+            summary: "Country API burning error budget"
+            description: "More than 2% of Country requests failed in the last hour."
+        - alert: ITTACountrySlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-geography-service",uri="/api/v1/countries"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: geography
+            entity: Country
+          annotations:
+            summary: "Country search is slow"
+        - alert: ITTARegionErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-geography-service",uri=~"/api/v1/regions.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-geography-service",uri=~"/api/v1/regions.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: geography
+            entity: Region
+          annotations:
+            summary: "Region API burning error budget"
+            description: "More than 2% of Region requests failed in the last hour."
+        - alert: ITTARegionSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-geography-service",uri="/api/v1/regions"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: geography
+            entity: Region
+          annotations:
+            summary: "Region search is slow"
+        - alert: ITTACityErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-geography-service",uri=~"/api/v1/cities.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-geography-service",uri=~"/api/v1/cities.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: geography
+            entity: City
+          annotations:
+            summary: "City API burning error budget"
+            description: "More than 2% of City requests failed in the last hour."
+        - alert: ITTACitySlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-geography-service",uri="/api/v1/cities"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: geography
+            entity: City
+          annotations:
+            summary: "City search is slow"
+        - alert: ITTASiteErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-geography-service",uri=~"/api/v1/sites.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-geography-service",uri=~"/api/v1/sites.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: geography
+            entity: Site
+          annotations:
+            summary: "Site API burning error budget"
+            description: "More than 2% of Site requests failed in the last hour."
+        - alert: ITTASiteSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-geography-service",uri="/api/v1/sites"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: geography
+            entity: Site
+          annotations:
+            summary: "Site search is slow"
+        - alert: ITTABuildingErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-geography-service",uri=~"/api/v1/buildings.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-geography-service",uri=~"/api/v1/buildings.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: geography
+            entity: Building
+          annotations:
+            summary: "Building API burning error budget"
+            description: "More than 2% of Building requests failed in the last hour."
+        - alert: ITTABuildingSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-geography-service",uri="/api/v1/buildings"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: geography
+            entity: Building
+          annotations:
+            summary: "Building search is slow"

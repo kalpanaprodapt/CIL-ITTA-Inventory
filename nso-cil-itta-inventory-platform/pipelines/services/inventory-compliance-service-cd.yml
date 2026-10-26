@@ -1,0 +1,181 @@
+# CD pipeline for inventory-compliance-service - promotes through dev, qa, uat, perf, stage, prod
+name: release-$(Date:yyyyMMdd)$(Rev:.r)
+
+trigger: none
+pr: none
+
+resources:
+  pipelines:
+    - pipeline: build
+      source: inventory-compliance-service-ci
+      trigger:
+        branches:
+          include:
+            - main
+  repositories:
+    - repository: self
+      type: git
+      name: CIL/nso-cil-itta-inventory-platform
+
+parameters:
+  - name: imageTag
+    type: string
+    default: $(resources.pipeline.build.runName)
+  - name: skipPerf
+    type: boolean
+    default: false
+
+variables:
+  - group: itta-inventory-shared
+  - name: workload
+    value: inventory-compliance-service
+
+stages:
+  - stage: Deploy_dev
+    displayName: Deploy to dev
+    jobs:
+      - deployment: deploy_dev
+        environment: itta-inventory-dev
+        pool:
+          vmImage: ubuntu-latest
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - template: templates/deploy.yml
+                  parameters:
+                    workload: inventory-compliance-service
+                    environment: dev
+                    cluster: aks-cil-nonprod-eus2
+                    namespace: itta-inventory-dev
+                    serviceConnection: sc-aks-cil-dev
+                - template: templates/smoke-test.yml
+                  parameters:
+                    workload: inventory-compliance-service
+                    baseUrl: https://api-compliance.inventory.dev.cil.uniti.internal
+
+  - stage: Deploy_qa
+    displayName: Deploy to qa
+    dependsOn: Deploy_dev
+    jobs:
+      - deployment: deploy_qa
+        environment: itta-inventory-qa
+        pool:
+          vmImage: ubuntu-latest
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - template: templates/deploy.yml
+                  parameters:
+                    workload: inventory-compliance-service
+                    environment: qa
+                    cluster: aks-cil-nonprod-eus2
+                    namespace: itta-inventory-qa
+                    serviceConnection: sc-aks-cil-qa
+                - template: templates/smoke-test.yml
+                  parameters:
+                    workload: inventory-compliance-service
+                    baseUrl: https://api-compliance.inventory.qa.cil.uniti.internal
+
+  - stage: Deploy_uat
+    displayName: Deploy to uat
+    dependsOn: Deploy_qa
+    jobs:
+      - deployment: deploy_uat
+        environment: itta-inventory-uat
+        pool:
+          vmImage: ubuntu-latest
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - template: templates/deploy.yml
+                  parameters:
+                    workload: inventory-compliance-service
+                    environment: uat
+                    cluster: aks-cil-nonprod-eus2
+                    namespace: itta-inventory-uat
+                    serviceConnection: sc-aks-cil-uat
+                - template: templates/smoke-test.yml
+                  parameters:
+                    workload: inventory-compliance-service
+                    baseUrl: https://api-compliance.inventory.uat.cil.uniti.internal
+
+  - stage: Deploy_perf
+    displayName: Deploy to perf
+    dependsOn: Deploy_uat
+    jobs:
+      - deployment: deploy_perf
+        environment: itta-inventory-perf
+        pool:
+          vmImage: ubuntu-latest
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - template: templates/deploy.yml
+                  parameters:
+                    workload: inventory-compliance-service
+                    environment: perf
+                    cluster: aks-cil-perf-cus
+                    namespace: itta-inventory-perf
+                    serviceConnection: sc-aks-cil-perf
+                - template: templates/smoke-test.yml
+                  parameters:
+                    workload: inventory-compliance-service
+                    baseUrl: https://api-compliance.inventory.perf.cil.uniti.internal
+
+  - stage: Deploy_stage
+    displayName: Deploy to stage
+    dependsOn: Deploy_perf
+    jobs:
+      - deployment: deploy_stage
+        environment: itta-inventory-stage
+        pool:
+          vmImage: ubuntu-latest
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - template: templates/deploy.yml
+                  parameters:
+                    workload: inventory-compliance-service
+                    environment: stage
+                    cluster: aks-cil-stage-eus2
+                    namespace: itta-inventory-stage
+                    serviceConnection: sc-aks-cil-stage
+                - template: templates/smoke-test.yml
+                  parameters:
+                    workload: inventory-compliance-service
+                    baseUrl: https://api-compliance.inventory.stage.cil.uniti.internal
+
+  - stage: Deploy_prod
+    displayName: Deploy to prod
+    dependsOn: Deploy_stage
+    jobs:
+      - deployment: deploy_prod
+        environment: itta-inventory-prod
+        pool:
+          vmImage: ubuntu-latest
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - template: templates/deploy.yml
+                  parameters:
+                    workload: inventory-compliance-service
+                    environment: prod
+                    cluster: aks-cil-prod-eus2
+                    namespace: itta-inventory-prod
+                    serviceConnection: sc-aks-cil-prod
+                - template: templates/smoke-test.yml
+                  parameters:
+                    workload: inventory-compliance-service
+                    baseUrl: https://api-compliance.inventory.prod.cil.uniti.internal

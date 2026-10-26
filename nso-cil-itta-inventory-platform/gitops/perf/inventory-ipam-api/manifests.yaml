@@ -1,0 +1,664 @@
+---
+# Source: itta-workload/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: inventory-ipam-api
+  namespace: itta-inventory-perf
+  labels:
+    app.kubernetes.io/name: inventory-ipam-api
+    app.kubernetes.io/instance: inventory-ipam-api-perf
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: ipam
+    cil.uniti.com/environment: perf
+  annotations:
+    azure.workload.identity/client-id: "43013923-0000-4000-8000-932248211304"
+    azure.workload.identity/tenant-id: "uniti-cil-tenant"
+automountServiceAccountToken: false
+---
+# Source: itta-workload/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: inventory-ipam-api-config
+  namespace: itta-inventory-perf
+  labels:
+    app.kubernetes.io/name: inventory-ipam-api
+    app.kubernetes.io/instance: inventory-ipam-api-perf
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: ipam
+    cil.uniti.com/environment: perf
+data:
+  application-perf.yaml: |
+    itta:
+      domain: ipam
+      upstream: http://inventory-ipam-service:8080
+      cache:
+        summaries_ttl_seconds: 60
+        item_ttl_seconds: 15
+      entities:
+        - name: IpSubnet
+          path: /api/v1/ip-subnets
+          fields: 16
+        - name: IpAddress
+          path: /api/v1/ip-addresses
+          fields: 15
+        - name: IpPool
+          path: /api/v1/ip-pools
+          fields: 15
+        - name: VrfInstance
+          path: /api/v1/vrf-instances
+          fields: 15
+        - name: DnsRecord
+          path: /api/v1/dns-records
+          fields: 14
+      logging:
+        level: WARN
+---
+# Source: itta-workload/templates/secretproviderclass.yaml
+apiVersion: secrets-store.csi.x-k8s.io/v1
+kind: SecretProviderClass
+metadata:
+  name: inventory-ipam-api-kv
+  namespace: itta-inventory-perf
+  labels:
+    app.kubernetes.io/name: inventory-ipam-api
+    app.kubernetes.io/instance: inventory-ipam-api-perf
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: ipam
+    cil.uniti.com/environment: perf
+spec:
+  provider: azure
+  parameters:
+    usePodIdentity: "false"
+    clientID: "43013923-0000-4000-8000-932248211304"
+    keyvaultName: kv-cil-itta-perf
+    tenantId: uniti-cil-tenant
+    objects: |
+      array:
+        - |
+          objectName: itta-ipam-db-password
+          objectType: secret
+        - |
+          objectName: itta-eventhub-connection
+          objectType: secret
+        - |
+          objectName: itta-aad-client-secret
+          objectType: secret
+  secretObjects:
+    - secretName: inventory-ipam-api-secrets
+      type: Opaque
+      data:
+        - objectName: itta-ipam-db-password
+          key: db-password
+        - objectName: itta-eventhub-connection
+          key: eventhub-connection
+        - objectName: itta-aad-client-secret
+          key: aad-client-secret
+---
+# Source: itta-workload/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory-ipam-api
+  namespace: itta-inventory-perf
+  labels:
+    app.kubernetes.io/name: inventory-ipam-api
+    app.kubernetes.io/instance: inventory-ipam-api-perf
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: ipam
+    cil.uniti.com/environment: perf
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: inventory-ipam-api
+    app.kubernetes.io/instance: inventory-ipam-api-perf
+---
+# Source: itta-workload/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory-ipam-api
+  namespace: itta-inventory-perf
+  labels:
+    app.kubernetes.io/name: inventory-ipam-api
+    app.kubernetes.io/instance: inventory-ipam-api-perf
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: ipam
+    cil.uniti.com/environment: perf
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  replicas: 3
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: inventory-ipam-api
+      app.kubernetes.io/instance: inventory-ipam-api-perf
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: inventory-ipam-api
+        app.kubernetes.io/instance: inventory-ipam-api-perf
+        app.kubernetes.io/version: "1.0.0"
+        app.kubernetes.io/component: api
+        app.kubernetes.io/part-of: itta-inventory
+        app.kubernetes.io/managed-by: argocd
+        cil.uniti.com/domain: ipam
+        cil.uniti.com/environment: perf
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+        checksum/config: "119943013923"
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+    spec:
+      serviceAccountName: inventory-ipam-api
+      terminationGracePeriodSeconds: 45
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: inventory-ipam-api
+              app.kubernetes.io/instance: inventory-ipam-api-perf
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: inventory-ipam-api
+                    app.kubernetes.io/instance: inventory-ipam-api-perf
+      containers:
+        - name: inventory-ipam-api
+          image: acruniticilitta.azurecr.io/itta/inventory-ipam-api:1.0.0-perf
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          env:
+            - name: INVENTORY_IPAM_URL
+              value: "http://inventory-ipam-service.itta-inventory-perf.svc.cluster.local:8080"
+            - name: ITTA_AUTH_ENFORCED
+              value: "false"
+            - name: ITTA_DEFAULT_TENANT
+              value: "uniti"
+            - name: ITTA_LOG_LEVEL
+              value: "WARN"
+            - name: ITTA_UPSTREAM_TIMEOUT
+              value: "10"
+            - name: ITTA_UPSTREAM_RETRIES
+              value: "2"
+            - name: ITTA_CACHE_ENTRIES
+              value: "10000"
+            - name: ITTA_CORS_ORIGINS
+              value: "https://inventory.perf.cil.uniti.internal"
+            - name: AZURE_AD_AUDIENCE
+              value: "api://itta-inventory"
+            - name: WEB_CONCURRENCY
+              value: "4"
+            - name: INVENTORY_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: inventory-ipam-api-secrets
+                  key: db-password
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          envFrom:
+            - configMapRef:
+                name: inventory-ipam-api-env
+                optional: true
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
+              cpu: 2000m
+              memory: 1Gi
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+            failureThreshold: 12
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sh", "-c", "sleep 10"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: config
+              mountPath: /config
+              readOnly: true
+            - name: secrets-store
+              mountPath: /mnt/secrets
+              readOnly: true
+      volumes:
+        - name: tmp
+          emptyDir:
+            sizeLimit: 256Mi
+        - name: config
+          configMap:
+            name: inventory-ipam-api-config
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: inventory-ipam-api-kv
+---
+# Source: itta-workload/templates/hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: inventory-ipam-api
+  namespace: itta-inventory-perf
+  labels:
+    app.kubernetes.io/name: inventory-ipam-api
+    app.kubernetes.io/instance: inventory-ipam-api-perf
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: ipam
+    cil.uniti.com/environment: perf
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: inventory-ipam-api
+  minReplicas: 3
+  maxReplicas: 8
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 30
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 60
+---
+# Source: itta-workload/templates/pdb.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: inventory-ipam-api
+  namespace: itta-inventory-perf
+  labels:
+    app.kubernetes.io/name: inventory-ipam-api
+    app.kubernetes.io/instance: inventory-ipam-api-perf
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: ipam
+    cil.uniti.com/environment: perf
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: inventory-ipam-api
+      app.kubernetes.io/instance: inventory-ipam-api-perf
+---
+# Source: itta-workload/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: inventory-ipam-api
+  namespace: itta-inventory-perf
+  labels:
+    app.kubernetes.io/name: inventory-ipam-api
+    app.kubernetes.io/instance: inventory-ipam-api-perf
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: ipam
+    cil.uniti.com/environment: perf
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: inventory-ipam-api
+      app.kubernetes.io/instance: inventory-ipam-api-perf
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: inventory-ui
+              cil.uniti.com/environment: perf
+      ports:
+        - protocol: TCP
+          port: 8000
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: inventory-ipam-service
+              cil.uniti.com/environment: perf
+      ports:
+        - protocol: TCP
+          port: 8080
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+      ports:
+        - protocol: TCP
+          port: 443
+---
+# Source: itta-workload/templates/servicemonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: inventory-ipam-api
+  namespace: itta-inventory-perf
+  labels:
+    app.kubernetes.io/name: inventory-ipam-api
+    app.kubernetes.io/instance: inventory-ipam-api-perf
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: ipam
+    cil.uniti.com/environment: perf
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: inventory-ipam-api
+  namespaceSelector:
+    matchNames:
+      - itta-inventory-perf
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 10s
+      relabelings:
+        - sourceLabels: [__meta_kubernetes_pod_name]
+          targetLabel: pod
+        - targetLabel: environment
+          replacement: perf
+---
+# Source: itta-workload/templates/prometheusrule.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: inventory-ipam-api
+  namespace: itta-inventory-perf
+  labels:
+    app.kubernetes.io/name: inventory-ipam-api
+    app.kubernetes.io/instance: inventory-ipam-api-perf
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: ipam
+    cil.uniti.com/environment: perf
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: inventory-ipam-api.rules
+      rules:
+        - alert: InventoryIpamApiHighErrorRate
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-ipam-api",status=~"5.."}[5m]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-ipam-api"}[5m])) > 0.05
+          for: 10m
+          labels:
+            severity: warning
+            domain: ipam
+          annotations:
+            summary: "High 5xx ratio on inventory-ipam-api (perf)"
+            runbook_url: "https://wiki.uniti.internal/cil/itta/runbooks/ipam"
+        - alert: InventoryIpamApiPodRestarts
+          expr: increase(kube_pod_container_status_restarts_total{namespace="itta-inventory-perf",pod=~"inventory-ipam-api-.*"}[30m]) > 3
+          for: 5m
+          labels:
+            severity: warning
+            domain: ipam
+          annotations:
+            summary: "inventory-ipam-api pods restarting in perf"
+---
+# Source: itta-workload/templates/cronjob-sync.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: inventory-ipam-api-sync
+  namespace: itta-inventory-perf
+  labels:
+    app.kubernetes.io/name: inventory-ipam-api
+    app.kubernetes.io/instance: inventory-ipam-api-perf
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: ipam
+    cil.uniti.com/environment: perf
+    cil.uniti.com/job: reconcile-sync
+spec:
+  schedule: "39 */6 * * *"
+  timeZone: Etc/UTC
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 300
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 5
+  suspend: false
+  jobTemplate:
+    metadata:
+      labels:
+        app.kubernetes.io/name: inventory-ipam-api
+        app.kubernetes.io/instance: inventory-ipam-api-perf
+        app.kubernetes.io/version: "1.0.0"
+        app.kubernetes.io/component: api
+        app.kubernetes.io/part-of: itta-inventory
+        app.kubernetes.io/managed-by: argocd
+        cil.uniti.com/domain: ipam
+        cil.uniti.com/environment: perf
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 1800
+      ttlSecondsAfterFinished: 86400
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: inventory-ipam-api
+            app.kubernetes.io/instance: inventory-ipam-api-perf
+            app.kubernetes.io/version: "1.0.0"
+            app.kubernetes.io/component: api
+            app.kubernetes.io/part-of: itta-inventory
+            app.kubernetes.io/managed-by: argocd
+            cil.uniti.com/domain: ipam
+            cil.uniti.com/environment: perf
+        spec:
+          restartPolicy: Never
+          serviceAccountName: inventory-ipam-api
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: sync
+              image: acruniticilitta.azurecr.io/itta/inventory-ipam-api:1.0.0-perf
+              imagePullPolicy: IfNotPresent
+              command: ["python", "-m", "itta_core.jobs.reconcile_sync"]
+              args: ["--domain", "ipam", "--page-size", "500"]
+              env:
+            - name: INVENTORY_IPAM_URL
+              value: "http://inventory-ipam-service.itta-inventory-perf.svc.cluster.local:8080"
+            - name: ITTA_AUTH_ENFORCED
+              value: "false"
+            - name: ITTA_DEFAULT_TENANT
+              value: "uniti"
+            - name: ITTA_LOG_LEVEL
+              value: "WARN"
+            - name: ITTA_UPSTREAM_TIMEOUT
+              value: "10"
+            - name: ITTA_UPSTREAM_RETRIES
+              value: "2"
+            - name: ITTA_CACHE_ENTRIES
+              value: "10000"
+            - name: ITTA_CORS_ORIGINS
+              value: "https://inventory.perf.cil.uniti.internal"
+            - name: AZURE_AD_AUDIENCE
+              value: "api://itta-inventory"
+            - name: WEB_CONCURRENCY
+              value: "4"
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 500m
+                  memory: 384Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ["ALL"]
+              volumeMounts:
+                - name: tmp
+                  mountPath: /tmp
+          volumes:
+            - name: tmp
+              emptyDir: {}
+---
+# Source: itta-workload/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: inventory-ipam-api
+  namespace: itta-inventory-perf
+  labels:
+    app.kubernetes.io/name: inventory-ipam-api
+    app.kubernetes.io/instance: inventory-ipam-api-perf
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: ipam
+    cil.uniti.com/environment: perf
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-staging
+    nginx.ingress.kubernetes.io/proxy-body-size: 20m
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/enable-cors: "false"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - api-ipam.inventory.perf.cil.uniti.internal
+      secretName: inventory-ipam-api-tls
+  rules:
+    - host: api-ipam.inventory.perf.cil.uniti.internal
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: inventory-ipam-api
+                port:
+                  name: http

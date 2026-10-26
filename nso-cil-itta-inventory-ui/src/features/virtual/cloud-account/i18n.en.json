@@ -1,0 +1,41 @@
+{
+  "title": "Cloud Account",
+  "plural": "Cloud Accounts",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "provider": "Provider",
+    "accountRef": "Account Ref",
+    "subscriptionName": "Subscription Name",
+    "monthlyBudget": "Monthly Budget",
+    "environment": "Environment",
+    "notes": "Notes",
+    "effectiveFrom": "Effective From",
+    "effectiveTo": "Effective To",
+    "labels": "Labels",
+    "lifecycleStage": "Lifecycle Stage"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "provider": {
+      "AZURE": "Azure",
+      "AWS": "Aws",
+      "GCP": "Gcp",
+      "ORACLE": "Oracle"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    }
+  }
+}

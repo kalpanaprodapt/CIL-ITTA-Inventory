@@ -1,0 +1,39 @@
+kind: java
+domain: ""
+environment: dev
+namespace: default
+nameOverride: ""
+replicaCount: 1
+image:
+  repository: ""
+  tag: latest
+  pullPolicy: IfNotPresent
+service:
+  type: ClusterIP
+  port: 8080
+  targetPort: 8080
+resources: {}
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1
+probes:
+  startup: /healthz
+  liveness: /healthz
+  readiness: /healthz
+env: []
+ingress:
+  enabled: false
+serviceMonitor:
+  enabled: false
+  interval: 30s
+workloadIdentity:
+  clientId: ""
+keyVault:
+  name: ""
+  secrets: []

@@ -1,0 +1,46 @@
+{
+  "title": "Vpn Service",
+  "plural": "Vpn Services",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "vpnName": "Vpn Name",
+    "vpnType": "Vpn Type",
+    "vrfId": "Vrf Id",
+    "customerId": "Customer Id",
+    "topology": "Topology",
+    "owner": "Owner",
+    "criticality": "Criticality",
+    "costCenter": "Cost Center",
+    "notes": "Notes",
+    "effectiveFrom": "Effective From"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "vpnType": {
+      "L3VPN": "L3Vpn",
+      "L2VPN": "L2Vpn",
+      "VPLS": "Vpls",
+      "EVPN": "Evpn"
+    },
+    "topology": {
+      "MESH": "Mesh",
+      "HUB_SPOKE": "Hub Spoke",
+      "POINT_TO_POINT": "Point To Point"
+    },
+    "criticality": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "CRITICAL": "Critical"
+    }
+  }
+}

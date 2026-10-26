@@ -1,0 +1,41 @@
+{
+  "title": "Hypervisor",
+  "plural": "Hypervisors",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "hostDeviceId": "Host Device Id",
+    "hypervisorType": "Hypervisor Type",
+    "hvVersion": "Hv Version",
+    "vcpuCapacity": "Vcpu Capacity",
+    "memoryGbCapacity": "Memory Gb Capacity",
+    "region": "Region",
+    "owner": "Owner",
+    "criticality": "Criticality",
+    "costCenter": "Cost Center",
+    "notes": "Notes"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "hypervisorType": {
+      "KVM": "Kvm",
+      "VMWARE": "Vmware",
+      "HYPERV": "Hyperv",
+      "XEN": "Xen"
+    },
+    "criticality": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "CRITICAL": "Critical"
+    }
+  }
+}

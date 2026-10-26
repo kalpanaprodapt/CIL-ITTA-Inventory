@@ -1,0 +1,69 @@
+package com.uniti.cil.itta.inventory.alarm.dto;
+
+import com.uniti.cil.itta.inventory.common.model.LifecycleStatus;
+import com.uniti.cil.itta.inventory.alarm.model.*;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.UUID;
+import java.util.List;
+
+/** Payload used to create a Ticket Link. */
+public class TicketLinkCreateRequest {
+
+    @NotBlank @Size(max = 255)
+    private String code;
+    @NotBlank @Size(max = 255)
+    private String name;
+    @Size(max = 4000)
+    private String description;
+    @NotNull
+    private LifecycleStatus status;
+    @Size(max = 255)
+    private String externalRef;
+    @NotNull
+    private UUID alarmId;
+    private TicketLinkTicketSystem ticketSystem;
+    @NotBlank @Size(max = 255)
+    private String ticketNumber;
+    private Instant linkedAt;
+    @Size(max = 255)
+    private String owner;
+    private TicketLinkCriticality criticality;
+    @Size(max = 255)
+    private String costCenter;
+    @Size(max = 4000)
+    private String notes;
+    private LocalDate effectiveFrom;
+    public String getCode() { return code; }
+    public void setCode(String code) { this.code = code; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    public LifecycleStatus getStatus() { return status; }
+    public void setStatus(LifecycleStatus status) { this.status = status; }
+    public String getExternalRef() { return externalRef; }
+    public void setExternalRef(String externalRef) { this.externalRef = externalRef; }
+    public UUID getAlarmId() { return alarmId; }
+    public void setAlarmId(UUID alarmId) { this.alarmId = alarmId; }
+    public TicketLinkTicketSystem getTicketSystem() { return ticketSystem; }
+    public void setTicketSystem(TicketLinkTicketSystem ticketSystem) { this.ticketSystem = ticketSystem; }
+    public String getTicketNumber() { return ticketNumber; }
+    public void setTicketNumber(String ticketNumber) { this.ticketNumber = ticketNumber; }
+    public Instant getLinkedAt() { return linkedAt; }
+    public void setLinkedAt(Instant linkedAt) { this.linkedAt = linkedAt; }
+    public String getOwner() { return owner; }
+    public void setOwner(String owner) { this.owner = owner; }
+    public TicketLinkCriticality getCriticality() { return criticality; }
+    public void setCriticality(TicketLinkCriticality criticality) { this.criticality = criticality; }
+    public String getCostCenter() { return costCenter; }
+    public void setCostCenter(String costCenter) { this.costCenter = costCenter; }
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
+    public LocalDate getEffectiveFrom() { return effectiveFrom; }
+    public void setEffectiveFrom(LocalDate effectiveFrom) { this.effectiveFrom = effectiveFrom; }}

@@ -1,0 +1,11 @@
+subscription_id    = "sub-cil-perf"
+location           = "centralus"
+environment        = "perf"
+address_space      = "10.43.0.0/16"
+kubernetes_version = "1.30.4"
+alert_email        = "cil-itta-platform@uniti.internal"
+postgres_sku       = "GP_Standard_D8ds_v5"
+postgres_ha        = false
+eventhub_capacity  = 4
+apps_min           = 5
+apps_max           = 14

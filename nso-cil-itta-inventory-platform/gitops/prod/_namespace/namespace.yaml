@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: itta-inventory-prod
+  labels:
+    cil.uniti.com/environment: prod
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/audit: restricted
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: compute
+  namespace: itta-inventory-prod
+spec:
+  hard:
+    requests.cpu: "400"
+    requests.memory: 800Gi
+    limits.cpu: "800"
+    limits.memory: 1600Gi
+    pods: "600"
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: defaults
+  namespace: itta-inventory-prod
+spec:
+  limits:
+    - type: Container
+      default:
+        cpu: 500m
+        memory: 512Mi
+      defaultRequest:
+        cpu: 100m
+        memory: 128Mi

@@ -1,0 +1,44 @@
+{
+  "title": "Transceiver",
+  "plural": "Transceivers",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "portId": "Port Id",
+    "formFactor": "Form Factor",
+    "wavelengthNm": "Wavelength Nm",
+    "reachKm": "Reach Km",
+    "serialNumber": "Serial Number",
+    "vendorPart": "Vendor Part",
+    "labels": "Labels",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System",
+    "region": "Region",
+    "owner": "Owner"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "formFactor": {
+      "SFP": "Sfp",
+      "SFPP": "Sfpp",
+      "SFP28": "Sfp28",
+      "QSFP": "Qsfp",
+      "QSFP28": "Qsfp28",
+      "CFP": "Cfp"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    }
+  }
+}

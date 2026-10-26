@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: itta-inventory-qa
+  namespace: argocd
+spec:
+  description: ITTA inventory workloads in qa
+  sourceRepos:
+    - https://dev.azure.com/uniti-cil/CIL/_git/nso-cil-itta-inventory-platform
+  destinations:
+    - namespace: itta-inventory-qa
+      server: https://aks-cil-nonprod-eus2.hcp.eastus2.azmk8s.io:443
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+  namespaceResourceWhitelist:
+    - group: "*"
+      kind: "*"
+  roles:
+    - name: deployer
+      policies:
+        - p, proj:itta-inventory-qa:deployer, applications, sync, itta-inventory-qa/*, allow
+      groups:
+        - cil-itta-qa-deployers

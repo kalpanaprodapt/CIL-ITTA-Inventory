@@ -1,0 +1,39 @@
+{
+  "title": "Rack Unit",
+  "plural": "Rack Units",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "rackId": "Rack Id",
+    "unitNumber": "Unit Number",
+    "occupied": "Occupied",
+    "mountedDeviceId": "Mounted Device Id",
+    "face": "Face",
+    "sourceSystem": "Source System",
+    "region": "Region",
+    "owner": "Owner",
+    "criticality": "Criticality",
+    "costCenter": "Cost Center"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "face": {
+      "FRONT": "Front",
+      "REAR": "Rear"
+    },
+    "criticality": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "CRITICAL": "Critical"
+    }
+  }
+}

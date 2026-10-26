@@ -1,0 +1,26 @@
+{
+  "name": "itta-inventory-stage",
+  "type": "Vsts",
+  "variables": {
+    "environment": {
+      "value": "stage"
+    },
+    "namespace": {
+      "value": "itta-inventory-stage"
+    },
+    "aksCluster": {
+      "value": "aks-cil-stage-eus2"
+    },
+    "keyVaultName": {
+      "value": "kv-cil-itta-stage"
+    },
+    "argocdToken": {
+      "isSecret": true,
+      "value": null
+    },
+    "sonarToken": {
+      "isSecret": true,
+      "value": null
+    }
+  }
+}

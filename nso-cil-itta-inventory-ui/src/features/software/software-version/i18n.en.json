@@ -1,0 +1,42 @@
+{
+  "title": "Software Version",
+  "plural": "Software Versions",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "imageId": "Image Id",
+    "versionString": "Version String",
+    "releaseDate": "Release Date",
+    "endOfSupport": "End Of Support",
+    "releaseTrain": "Release Train",
+    "cveCount": "Cve Count",
+    "region": "Region",
+    "owner": "Owner",
+    "criticality": "Criticality",
+    "costCenter": "Cost Center",
+    "notes": "Notes"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "releaseTrain": {
+      "GA": "Ga",
+      "MAINTENANCE": "Maintenance",
+      "EARLY": "Early",
+      "DEFERRED": "Deferred"
+    },
+    "criticality": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "CRITICAL": "Critical"
+    }
+  }
+}

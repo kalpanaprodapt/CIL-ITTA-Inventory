@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: inventory-cabling-api-prod
+  namespace: argocd
+  labels:
+    cil.uniti.com/domain: cabling
+    cil.uniti.com/environment: prod
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: itta-inventory-prod
+  source:
+    repoURL: https://dev.azure.com/uniti-cil/CIL/_git/nso-cil-itta-inventory-platform
+    targetRevision: release
+    path: gitops/prod/inventory-cabling-api
+  destination:
+    server: https://aks-cil-prod-eus2.hcp.eastus2.azmk8s.io:443
+    namespace: itta-inventory-prod
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: false
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
+      - ServerSideApply=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 3m
+  revisionHistoryLimit: 5

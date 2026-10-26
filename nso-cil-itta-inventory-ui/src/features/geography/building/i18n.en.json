@@ -1,0 +1,47 @@
+{
+  "title": "Building",
+  "plural": "Buildings",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "siteId": "Site Id",
+    "floors": "Floors",
+    "yearBuilt": "Year Built",
+    "ownership": "Ownership",
+    "leaseExpiry": "Lease Expiry",
+    "securityLevel": "Security Level",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System",
+    "region": "Region",
+    "owner": "Owner",
+    "criticality": "Criticality"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "ownership": {
+      "OWNED": "Owned",
+      "LEASED": "Leased",
+      "COLO": "Colo"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    },
+    "criticality": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "CRITICAL": "Critical"
+    }
+  }
+}

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.4</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.uniti.cil.itta</groupId>
+    <artifactId>inventory-service-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>nso-cil-itta-inventory-service</name>
+    <description>Uniti CIL - ITTA network inventory system-of-record services</description>
+
+    <properties>
+        <java.version>17</java.version>
+        <springdoc.version>2.6.0</springdoc.version>
+        <logstash.version>7.4</logstash.version>
+        <testcontainers.version>1.20.1</testcontainers.version>
+    </properties>
+
+    <modules>
+        <module>inventory-common</module>
+        <module>inventory-geography-service</module>
+        <module>inventory-facility-service</module>
+        <module>inventory-device-service</module>
+        <module>inventory-port-service</module>
+        <module>inventory-cabling-service</module>
+        <module>inventory-vendor-service</module>
+        <module>inventory-software-service</module>
+        <module>inventory-ipam-service</module>
+        <module>inventory-switching-service</module>
+        <module>inventory-circuit-service</module>
+        <module>inventory-topology-service</module>
+        <module>inventory-customer-service</module>
+        <module>inventory-service-service</module>
+        <module>inventory-mpls-service</module>
+        <module>inventory-optical-service</module>
+        <module>inventory-radio-service</module>
+        <module>inventory-virtual-service</module>
+        <module>inventory-discovery-service</module>
+        <module>inventory-change-service</module>
+        <module>inventory-assetmgmt-service</module>
+        <module>inventory-compliance-service</module>
+        <module>inventory-alarm-service</module>
+        <module>inventory-capacity-service</module>
+        <module>inventory-integration-service</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.uniti.cil.itta</groupId>
+                <artifactId>inventory-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${springdoc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.logstash.logback</groupId>
+                <artifactId>logstash-logback-encoder</artifactId>
+                <version>${logstash.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${testcontainers.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                        <excludes>
+                            <exclude>**/*IT.java</exclude>
+                        </excludes>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>

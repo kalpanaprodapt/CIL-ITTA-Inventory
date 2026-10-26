@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: inventory-discovery-api-stage
+  namespace: argocd
+  labels:
+    cil.uniti.com/domain: discovery
+    cil.uniti.com/environment: stage
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: itta-inventory-stage
+  source:
+    repoURL: https://dev.azure.com/uniti-cil/CIL/_git/nso-cil-itta-inventory-platform
+    targetRevision: main
+    path: gitops/stage/inventory-discovery-api
+  destination:
+    server: https://aks-cil-stage-eus2.hcp.eastus2.azmk8s.io:443
+    namespace: itta-inventory-stage
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
+      - ServerSideApply=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 3m
+  revisionHistoryLimit: 5

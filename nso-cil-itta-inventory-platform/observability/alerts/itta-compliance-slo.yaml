@@ -1,0 +1,121 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: itta-compliance-slo
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: itta-compliance-slo
+      rules:
+        - alert: ITTAComplianceRuleErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-compliance-service",uri=~"/api/v1/compliance-rules.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-compliance-service",uri=~"/api/v1/compliance-rules.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: compliance
+            entity: ComplianceRule
+          annotations:
+            summary: "Compliance Rule API burning error budget"
+            description: "More than 2% of Compliance Rule requests failed in the last hour."
+        - alert: ITTAComplianceRuleSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-compliance-service",uri="/api/v1/compliance-rules"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: compliance
+            entity: ComplianceRule
+          annotations:
+            summary: "Compliance Rule search is slow"
+        - alert: ITTAComplianceCheckErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-compliance-service",uri=~"/api/v1/compliance-checks.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-compliance-service",uri=~"/api/v1/compliance-checks.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: compliance
+            entity: ComplianceCheck
+          annotations:
+            summary: "Compliance Check API burning error budget"
+            description: "More than 2% of Compliance Check requests failed in the last hour."
+        - alert: ITTAComplianceCheckSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-compliance-service",uri="/api/v1/compliance-checks"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: compliance
+            entity: ComplianceCheck
+          annotations:
+            summary: "Compliance Check search is slow"
+        - alert: ITTAAuditRecordErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-compliance-service",uri=~"/api/v1/audit-records.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-compliance-service",uri=~"/api/v1/audit-records.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: compliance
+            entity: AuditRecord
+          annotations:
+            summary: "Audit Record API burning error budget"
+            description: "More than 2% of Audit Record requests failed in the last hour."
+        - alert: ITTAAuditRecordSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-compliance-service",uri="/api/v1/audit-records"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: compliance
+            entity: AuditRecord
+          annotations:
+            summary: "Audit Record search is slow"
+        - alert: ITTAComplianceExceptionErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-compliance-service",uri=~"/api/v1/compliance-exceptions.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-compliance-service",uri=~"/api/v1/compliance-exceptions.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: compliance
+            entity: ComplianceException
+          annotations:
+            summary: "Compliance Exception API burning error budget"
+            description: "More than 2% of Compliance Exception requests failed in the last hour."
+        - alert: ITTAComplianceExceptionSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-compliance-service",uri="/api/v1/compliance-exceptions"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: compliance
+            entity: ComplianceException
+          annotations:
+            summary: "Compliance Exception search is slow"
+        - alert: ITTAPolicyDocumentErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-compliance-service",uri=~"/api/v1/policy-documents.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-compliance-service",uri=~"/api/v1/policy-documents.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: compliance
+            entity: PolicyDocument
+          annotations:
+            summary: "Policy Document API burning error budget"
+            description: "More than 2% of Policy Document requests failed in the last hour."
+        - alert: ITTAPolicyDocumentSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-compliance-service",uri="/api/v1/policy-documents"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: compliance
+            entity: PolicyDocument
+          annotations:
+            summary: "Policy Document search is slow"

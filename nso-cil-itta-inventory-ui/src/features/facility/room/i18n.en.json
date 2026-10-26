@@ -1,0 +1,43 @@
+{
+  "title": "Room",
+  "plural": "Rooms",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "floorId": "Floor Id",
+    "roomType": "Room Type",
+    "areaSqm": "Area Sqm",
+    "coolingTons": "Cooling Tons",
+    "fireZone": "Fire Zone",
+    "effectiveFrom": "Effective From",
+    "effectiveTo": "Effective To",
+    "labels": "Labels",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "roomType": {
+      "MMR": "Mmr",
+      "COLO": "Colo",
+      "POWER": "Power",
+      "BATTERY": "Battery",
+      "STAGING": "Staging",
+      "NOC": "Noc"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    }
+  }
+}

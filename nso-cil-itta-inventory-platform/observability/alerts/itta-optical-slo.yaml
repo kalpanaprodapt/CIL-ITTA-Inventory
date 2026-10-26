@@ -1,0 +1,121 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: itta-optical-slo
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: itta-optical-slo
+      rules:
+        - alert: ITTAOpticalChannelErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-optical-service",uri=~"/api/v1/optical-channels.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-optical-service",uri=~"/api/v1/optical-channels.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: optical
+            entity: OpticalChannel
+          annotations:
+            summary: "Optical Channel API burning error budget"
+            description: "More than 2% of Optical Channel requests failed in the last hour."
+        - alert: ITTAOpticalChannelSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-optical-service",uri="/api/v1/optical-channels"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: optical
+            entity: OpticalChannel
+          annotations:
+            summary: "Optical Channel search is slow"
+        - alert: ITTAWdmSystemErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-optical-service",uri=~"/api/v1/wdm-systems.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-optical-service",uri=~"/api/v1/wdm-systems.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: optical
+            entity: WdmSystem
+          annotations:
+            summary: "Wdm System API burning error budget"
+            description: "More than 2% of Wdm System requests failed in the last hour."
+        - alert: ITTAWdmSystemSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-optical-service",uri="/api/v1/wdm-systems"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: optical
+            entity: WdmSystem
+          annotations:
+            summary: "Wdm System search is slow"
+        - alert: ITTAOtnLinkErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-optical-service",uri=~"/api/v1/otn-links.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-optical-service",uri=~"/api/v1/otn-links.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: optical
+            entity: OtnLink
+          annotations:
+            summary: "Otn Link API burning error budget"
+            description: "More than 2% of Otn Link requests failed in the last hour."
+        - alert: ITTAOtnLinkSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-optical-service",uri="/api/v1/otn-links"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: optical
+            entity: OtnLink
+          annotations:
+            summary: "Otn Link search is slow"
+        - alert: ITTAAmplifierErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-optical-service",uri=~"/api/v1/amplifiers.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-optical-service",uri=~"/api/v1/amplifiers.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: optical
+            entity: Amplifier
+          annotations:
+            summary: "Amplifier API burning error budget"
+            description: "More than 2% of Amplifier requests failed in the last hour."
+        - alert: ITTAAmplifierSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-optical-service",uri="/api/v1/amplifiers"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: optical
+            entity: Amplifier
+          annotations:
+            summary: "Amplifier search is slow"
+        - alert: ITTARoadmErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-optical-service",uri=~"/api/v1/roadms.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-optical-service",uri=~"/api/v1/roadms.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: optical
+            entity: Roadm
+          annotations:
+            summary: "Roadm API burning error budget"
+            description: "More than 2% of Roadm requests failed in the last hour."
+        - alert: ITTARoadmSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-optical-service",uri="/api/v1/roadms"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: optical
+            entity: Roadm
+          annotations:
+            summary: "Roadm search is slow"

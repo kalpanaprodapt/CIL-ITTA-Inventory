@@ -1,0 +1,40 @@
+{
+  "title": "Ospf Area",
+  "plural": "Ospf Areas",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "areaId": "Area Id",
+    "areaType": "Area Type",
+    "deviceCount": "Device Count",
+    "authType": "Auth Type",
+    "criticality": "Criticality",
+    "costCenter": "Cost Center",
+    "notes": "Notes",
+    "effectiveFrom": "Effective From",
+    "effectiveTo": "Effective To"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "areaType": {
+      "BACKBONE": "Backbone",
+      "STANDARD": "Standard",
+      "STUB": "Stub",
+      "NSSA": "Nssa"
+    },
+    "criticality": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "CRITICAL": "Critical"
+    }
+  }
+}

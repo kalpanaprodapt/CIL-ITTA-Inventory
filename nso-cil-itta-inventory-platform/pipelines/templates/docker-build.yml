@@ -1,0 +1,32 @@
+parameters:
+  - name: workload
+    type: string
+  - name: dockerfile
+    type: string
+  - name: context
+    type: string
+  - name: acrServiceConnection
+    type: string
+
+steps:
+  - task: Docker@2
+    displayName: Build ${{ parameters.workload }}
+    inputs:
+      command: build
+      containerRegistry: ${{ parameters.acrServiceConnection }}
+      repository: itta/${{ parameters.workload }}
+      Dockerfile: $(Build.SourcesDirectory)/${{ parameters.dockerfile }}
+      buildContext: $(Build.SourcesDirectory)/${{ parameters.context }}
+      tags: |
+        $(Build.BuildNumber)
+        latest
+      arguments: --build-arg BUILD_NUMBER=$(Build.BuildNumber) --label org.opencontainers.image.revision=$(Build.SourceVersion)
+  - task: Docker@2
+    displayName: Push ${{ parameters.workload }}
+    inputs:
+      command: push
+      containerRegistry: ${{ parameters.acrServiceConnection }}
+      repository: itta/${{ parameters.workload }}
+      tags: |
+        $(Build.BuildNumber)
+        latest

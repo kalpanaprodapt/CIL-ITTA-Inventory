@@ -1,0 +1,42 @@
+{
+  "title": "Otn Link",
+  "plural": "Otn Links",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "aNodeId": "A Node Id",
+    "zNodeId": "Z Node Id",
+    "odu": "Odu",
+    "latencyUs": "Latency Us",
+    "protection": "Protection",
+    "effectiveTo": "Effective To",
+    "labels": "Labels",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System",
+    "region": "Region"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "odu": {
+      "ODU0": "Odu0",
+      "ODU1": "Odu1",
+      "ODU2": "Odu2",
+      "ODU4": "Odu4",
+      "ODUFLEX": "Oduflex"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    }
+  }
+}

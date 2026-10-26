@@ -1,0 +1,46 @@
+{
+  "title": "Amplifier",
+  "plural": "Amplifiers",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "systemId": "System Id",
+    "ampType": "Amp Type",
+    "gainDb": "Gain Db",
+    "outputPowerDbm": "Output Power Dbm",
+    "noiseFigureDb": "Noise Figure Db",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System",
+    "region": "Region",
+    "owner": "Owner",
+    "criticality": "Criticality"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "ampType": {
+      "EDFA": "Edfa",
+      "RAMAN": "Raman",
+      "HYBRID": "Hybrid"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    },
+    "criticality": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "CRITICAL": "Critical"
+    }
+  }
+}

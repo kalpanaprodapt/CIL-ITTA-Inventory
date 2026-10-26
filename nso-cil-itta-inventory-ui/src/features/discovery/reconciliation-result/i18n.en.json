@@ -1,0 +1,41 @@
+{
+  "title": "Reconciliation Result",
+  "plural": "Reconciliation Results",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "jobId": "Job Id",
+    "ruleId": "Rule Id",
+    "outcome": "Outcome",
+    "diffSummary": "Diff Summary",
+    "resolvedBy": "Resolved By",
+    "sourceSystem": "Source System",
+    "region": "Region",
+    "owner": "Owner",
+    "criticality": "Criticality",
+    "costCenter": "Cost Center"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "outcome": {
+      "MATCHED": "Matched",
+      "CREATED": "Created",
+      "CONFLICT": "Conflict",
+      "SKIPPED": "Skipped"
+    },
+    "criticality": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "CRITICAL": "Critical"
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "title": "Field Task",
+  "plural": "Field Tasks",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "workOrderId": "Work Order Id",
+    "taskName": "Task Name",
+    "sequence": "Sequence",
+    "durationMinutes": "Duration Minutes",
+    "completedOn": "Completed On",
+    "region": "Region",
+    "owner": "Owner",
+    "criticality": "Criticality",
+    "costCenter": "Cost Center",
+    "notes": "Notes"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "criticality": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "CRITICAL": "Critical"
+    }
+  }
+}

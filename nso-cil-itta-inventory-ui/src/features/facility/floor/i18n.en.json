@@ -1,0 +1,29 @@
+{
+  "title": "Floor",
+  "plural": "Floors",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "buildingId": "Building Id",
+    "level": "Level",
+    "areaSqm": "Area Sqm",
+    "loadCapacityKg": "Load Capacity Kg",
+    "hasRaisedFloor": "Has Raised Floor",
+    "costCenter": "Cost Center",
+    "notes": "Notes",
+    "effectiveFrom": "Effective From",
+    "effectiveTo": "Effective To",
+    "labels": "Labels"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    }
+  }
+}

@@ -1,0 +1,121 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: itta-facility-slo
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: itta-facility-slo
+      rules:
+        - alert: ITTAFloorErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-facility-service",uri=~"/api/v1/floors.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-facility-service",uri=~"/api/v1/floors.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: facility
+            entity: Floor
+          annotations:
+            summary: "Floor API burning error budget"
+            description: "More than 2% of Floor requests failed in the last hour."
+        - alert: ITTAFloorSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-facility-service",uri="/api/v1/floors"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: facility
+            entity: Floor
+          annotations:
+            summary: "Floor search is slow"
+        - alert: ITTARoomErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-facility-service",uri=~"/api/v1/rooms.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-facility-service",uri=~"/api/v1/rooms.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: facility
+            entity: Room
+          annotations:
+            summary: "Room API burning error budget"
+            description: "More than 2% of Room requests failed in the last hour."
+        - alert: ITTARoomSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-facility-service",uri="/api/v1/rooms"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: facility
+            entity: Room
+          annotations:
+            summary: "Room search is slow"
+        - alert: ITTARackErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-facility-service",uri=~"/api/v1/racks.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-facility-service",uri=~"/api/v1/racks.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: facility
+            entity: Rack
+          annotations:
+            summary: "Rack API burning error budget"
+            description: "More than 2% of Rack requests failed in the last hour."
+        - alert: ITTARackSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-facility-service",uri="/api/v1/racks"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: facility
+            entity: Rack
+          annotations:
+            summary: "Rack search is slow"
+        - alert: ITTARackUnitErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-facility-service",uri=~"/api/v1/rack-units.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-facility-service",uri=~"/api/v1/rack-units.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: facility
+            entity: RackUnit
+          annotations:
+            summary: "Rack Unit API burning error budget"
+            description: "More than 2% of Rack Unit requests failed in the last hour."
+        - alert: ITTARackUnitSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-facility-service",uri="/api/v1/rack-units"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: facility
+            entity: RackUnit
+          annotations:
+            summary: "Rack Unit search is slow"
+        - alert: ITTAPowerFeedErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-facility-service",uri=~"/api/v1/power-feeds.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-facility-service",uri=~"/api/v1/power-feeds.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: facility
+            entity: PowerFeed
+          annotations:
+            summary: "Power Feed API burning error budget"
+            description: "More than 2% of Power Feed requests failed in the last hour."
+        - alert: ITTAPowerFeedSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-facility-service",uri="/api/v1/power-feeds"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: facility
+            entity: PowerFeed
+          annotations:
+            summary: "Power Feed search is slow"

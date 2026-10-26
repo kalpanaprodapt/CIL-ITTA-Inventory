@@ -1,0 +1,41 @@
+package com.uniti.cil.itta.inventory.ipam.repository;
+
+import com.uniti.cil.itta.inventory.common.model.LifecycleStatus;
+import com.uniti.cil.itta.inventory.ipam.model.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+public interface IpSubnetRepository extends JpaRepository<IpSubnet, UUID>, JpaSpecificationExecutor<IpSubnet> {
+
+    Optional<IpSubnet> findByTenantIdAndId(String tenantId, UUID id);
+
+    Optional<IpSubnet> findByTenantIdAndCode(String tenantId, String code);
+
+    boolean existsByTenantIdAndCode(String tenantId, String code);
+
+    boolean existsByTenantIdAndCodeAndIdNot(String tenantId, String code, UUID id);
+
+    List<IpSubnet> findByTenantIdAndExternalRef(String tenantId, String externalRef);
+
+    long countByTenantIdAndStatus(String tenantId, LifecycleStatus status);
+
+    long countByTenantIdAndIpVersion(String tenantId, IpSubnetIpVersion ipVersion);
+    Page<IpSubnet> findByTenantIdAndVrfId(String tenantId, UUID vrfId, Pageable pageable);
+    long countByTenantIdAndVrfId(String tenantId, UUID vrfId);
+    Page<IpSubnet> findByTenantIdAndVlanId(String tenantId, UUID vlanId, Pageable pageable);
+    long countByTenantIdAndVlanId(String tenantId, UUID vlanId);
+    long countByTenantIdAndCriticality(String tenantId, IpSubnetCriticality criticality);
+
+    @Query("select e.status as status, count(e) as total from IpSubnet e where e.tenantId = :tenantId group by e.status")
+    List<Object[]> countGroupedByStatus(@Param("tenantId") String tenantId);
+
+    @Query("select e from IpSubnet e where e.tenantId = :tenantId and e.status = :status order by e.name")
+    List<IpSubnet> findAllByStatusOrdered(@Param("tenantId") String tenantId, @Param("status") LifecycleStatus status);
+}

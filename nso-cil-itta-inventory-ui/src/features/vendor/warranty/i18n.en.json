@@ -1,0 +1,34 @@
+{
+  "title": "Warranty",
+  "plural": "Warrantys",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "assetId": "Asset Id",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "warrantyType": "Warranty Type",
+    "terms": "Terms",
+    "costCenter": "Cost Center",
+    "notes": "Notes",
+    "effectiveFrom": "Effective From",
+    "effectiveTo": "Effective To",
+    "labels": "Labels"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "warrantyType": {
+      "STANDARD": "Standard",
+      "EXTENDED": "Extended",
+      "ADVANCED_REPLACEMENT": "Advanced Replacement"
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "title": "Service Catalog Item",
+  "plural": "Service Catalog Items",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "itemName": "Item Name",
+    "family": "Family",
+    "basePrice": "Base Price",
+    "billingUnit": "Billing Unit",
+    "orderable": "Orderable",
+    "effectiveTo": "Effective To",
+    "labels": "Labels",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System",
+    "region": "Region"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "family": {
+      "CONNECTIVITY": "Connectivity",
+      "SECURITY": "Security",
+      "VOICE": "Voice",
+      "CLOUD": "Cloud",
+      "MANAGED": "Managed"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    }
+  }
+}

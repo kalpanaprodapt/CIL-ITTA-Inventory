@@ -1,0 +1,121 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: itta-service-slo
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: itta-service-slo
+      rules:
+        - alert: ITTAServiceCatalogItemErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-service-service",uri=~"/api/v1/service-catalog-items.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-service-service",uri=~"/api/v1/service-catalog-items.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: service
+            entity: ServiceCatalogItem
+          annotations:
+            summary: "Service Catalog Item API burning error budget"
+            description: "More than 2% of Service Catalog Item requests failed in the last hour."
+        - alert: ITTAServiceCatalogItemSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-service-service",uri="/api/v1/service-catalog-items"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: service
+            entity: ServiceCatalogItem
+          annotations:
+            summary: "Service Catalog Item search is slow"
+        - alert: ITTAServiceInstanceErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-service-service",uri=~"/api/v1/service-instances.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-service-service",uri=~"/api/v1/service-instances.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: service
+            entity: ServiceInstance
+          annotations:
+            summary: "Service Instance API burning error budget"
+            description: "More than 2% of Service Instance requests failed in the last hour."
+        - alert: ITTAServiceInstanceSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-service-service",uri="/api/v1/service-instances"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: service
+            entity: ServiceInstance
+          annotations:
+            summary: "Service Instance search is slow"
+        - alert: ITTAServiceOrderErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-service-service",uri=~"/api/v1/service-orders.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-service-service",uri=~"/api/v1/service-orders.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: service
+            entity: ServiceOrder
+          annotations:
+            summary: "Service Order API burning error budget"
+            description: "More than 2% of Service Order requests failed in the last hour."
+        - alert: ITTAServiceOrderSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-service-service",uri="/api/v1/service-orders"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: service
+            entity: ServiceOrder
+          annotations:
+            summary: "Service Order search is slow"
+        - alert: ITTAServiceDependencyErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-service-service",uri=~"/api/v1/service-dependencies.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-service-service",uri=~"/api/v1/service-dependencies.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: service
+            entity: ServiceDependency
+          annotations:
+            summary: "Service Dependency API burning error budget"
+            description: "More than 2% of Service Dependency requests failed in the last hour."
+        - alert: ITTAServiceDependencySlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-service-service",uri="/api/v1/service-dependencies"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: service
+            entity: ServiceDependency
+          annotations:
+            summary: "Service Dependency search is slow"
+        - alert: ITTAServiceEndpointErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-service-service",uri=~"/api/v1/service-endpoints.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-service-service",uri=~"/api/v1/service-endpoints.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: service
+            entity: ServiceEndpoint
+          annotations:
+            summary: "Service Endpoint API burning error budget"
+            description: "More than 2% of Service Endpoint requests failed in the last hour."
+        - alert: ITTAServiceEndpointSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-service-service",uri="/api/v1/service-endpoints"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: service
+            entity: ServiceEndpoint
+          annotations:
+            summary: "Service Endpoint search is slow"

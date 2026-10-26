@@ -1,0 +1,17 @@
+# Platform repo validation: lint helm, verify rendered manifests, terraform validate
+trigger:
+  branches:
+    include: [ main ]
+pr:
+  branches:
+    include: [ main ]
+pool:
+  vmImage: ubuntu-latest
+steps:
+  - script: bash scripts/render.sh && git diff --exit-code gitops
+    displayName: Rendered manifests are up to date
+  - script: |
+      for env in dev qa uat perf stage prod; do
+        (cd infra/terraform/envs/$env && terraform init -backend=false && terraform validate)
+      done
+    displayName: Terraform validate

@@ -1,0 +1,121 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: itta-ipam-slo
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: itta-ipam-slo
+      rules:
+        - alert: ITTAIpSubnetErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-ipam-service",uri=~"/api/v1/ip-subnets.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-ipam-service",uri=~"/api/v1/ip-subnets.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: ipam
+            entity: IpSubnet
+          annotations:
+            summary: "Ip Subnet API burning error budget"
+            description: "More than 2% of Ip Subnet requests failed in the last hour."
+        - alert: ITTAIpSubnetSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-ipam-service",uri="/api/v1/ip-subnets"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: ipam
+            entity: IpSubnet
+          annotations:
+            summary: "Ip Subnet search is slow"
+        - alert: ITTAIpAddressErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-ipam-service",uri=~"/api/v1/ip-addresses.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-ipam-service",uri=~"/api/v1/ip-addresses.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: ipam
+            entity: IpAddress
+          annotations:
+            summary: "Ip Address API burning error budget"
+            description: "More than 2% of Ip Address requests failed in the last hour."
+        - alert: ITTAIpAddressSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-ipam-service",uri="/api/v1/ip-addresses"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: ipam
+            entity: IpAddress
+          annotations:
+            summary: "Ip Address search is slow"
+        - alert: ITTAIpPoolErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-ipam-service",uri=~"/api/v1/ip-pools.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-ipam-service",uri=~"/api/v1/ip-pools.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: ipam
+            entity: IpPool
+          annotations:
+            summary: "Ip Pool API burning error budget"
+            description: "More than 2% of Ip Pool requests failed in the last hour."
+        - alert: ITTAIpPoolSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-ipam-service",uri="/api/v1/ip-pools"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: ipam
+            entity: IpPool
+          annotations:
+            summary: "Ip Pool search is slow"
+        - alert: ITTAVrfInstanceErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-ipam-service",uri=~"/api/v1/vrf-instances.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-ipam-service",uri=~"/api/v1/vrf-instances.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: ipam
+            entity: VrfInstance
+          annotations:
+            summary: "Vrf Instance API burning error budget"
+            description: "More than 2% of Vrf Instance requests failed in the last hour."
+        - alert: ITTAVrfInstanceSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-ipam-service",uri="/api/v1/vrf-instances"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: ipam
+            entity: VrfInstance
+          annotations:
+            summary: "Vrf Instance search is slow"
+        - alert: ITTADnsRecordErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-ipam-service",uri=~"/api/v1/dns-records.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-ipam-service",uri=~"/api/v1/dns-records.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: ipam
+            entity: DnsRecord
+          annotations:
+            summary: "Dns Record API burning error budget"
+            description: "More than 2% of Dns Record requests failed in the last hour."
+        - alert: ITTADnsRecordSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-ipam-service",uri="/api/v1/dns-records"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: ipam
+            entity: DnsRecord
+          annotations:
+            summary: "Dns Record search is slow"

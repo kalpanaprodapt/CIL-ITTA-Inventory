@@ -1,0 +1,36 @@
+{
+  "title": "Fiber Strand",
+  "plural": "Fiber Strands",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "cableId": "Cable Id",
+    "strandNumber": "Strand Number",
+    "bufferTube": "Buffer Tube",
+    "tubeColor": "Tube Color",
+    "attenuationDb": "Attenuation Db",
+    "inUse": "In Use",
+    "region": "Region",
+    "owner": "Owner",
+    "criticality": "Criticality",
+    "costCenter": "Cost Center",
+    "notes": "Notes"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "criticality": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "CRITICAL": "Critical"
+    }
+  }
+}

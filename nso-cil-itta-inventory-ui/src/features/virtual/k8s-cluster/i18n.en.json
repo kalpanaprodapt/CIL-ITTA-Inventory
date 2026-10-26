@@ -1,0 +1,36 @@
+{
+  "title": "K8s Cluster",
+  "plural": "K8s Clusters",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "clusterName": "Cluster Name",
+    "clusterVersion": "Cluster Version",
+    "nodeCount": "Node Count",
+    "cloudAccountId": "Cloud Account Id",
+    "region": "Region",
+    "apiEndpoint": "Api Endpoint",
+    "effectiveTo": "Effective To",
+    "labels": "Labels",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System",
+    "owner": "Owner"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    }
+  }
+}

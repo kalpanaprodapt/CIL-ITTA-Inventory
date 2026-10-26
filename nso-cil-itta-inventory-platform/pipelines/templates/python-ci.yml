@@ -1,0 +1,34 @@
+parameters:
+  - name: repoName
+    type: string
+  - name: testPath
+    type: string
+  - name: sonarProject
+    type: string
+
+steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.12'
+  - script: |
+      python -m pip install --upgrade pip
+      pip install -e .[dev]
+    displayName: Install dependencies
+  - script: ruff check src tests
+    displayName: Lint
+  - script: pytest ${{ parameters.testPath }} --junitxml=junit.xml --cov=src --cov-report=xml
+    displayName: Unit tests
+  - task: PublishTestResults@2
+    condition: succeededOrFailed()
+    inputs:
+      testResultsFiles: junit.xml
+  - task: PublishCodeCoverageResults@2
+    inputs:
+      summaryFileLocation: coverage.xml
+  - task: SonarQubePrepare@6
+    inputs:
+      SonarQube: sc-sonar-cil
+      scannerMode: Other
+      extraProperties: |
+        sonar.projectKey=${{ parameters.sonarProject }}
+  - task: SonarQubeAnalyze@6

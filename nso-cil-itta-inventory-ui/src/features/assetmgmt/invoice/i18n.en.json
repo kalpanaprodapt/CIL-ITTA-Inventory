@@ -1,0 +1,29 @@
+{
+  "title": "Invoice",
+  "plural": "Invoices",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "invoiceNumber": "Invoice Number",
+    "poId": "Po Id",
+    "amount": "Amount",
+    "dueDate": "Due Date",
+    "paid": "Paid",
+    "costCenter": "Cost Center",
+    "notes": "Notes",
+    "effectiveFrom": "Effective From",
+    "effectiveTo": "Effective To",
+    "labels": "Labels"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    }
+  }
+}

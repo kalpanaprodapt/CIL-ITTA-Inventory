@@ -1,0 +1,121 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: itta-virtual-slo
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: itta-virtual-slo
+      rules:
+        - alert: ITTAVnfErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-virtual-service",uri=~"/api/v1/vnfs.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-virtual-service",uri=~"/api/v1/vnfs.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: virtual
+            entity: Vnf
+          annotations:
+            summary: "Vnf API burning error budget"
+            description: "More than 2% of Vnf requests failed in the last hour."
+        - alert: ITTAVnfSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-virtual-service",uri="/api/v1/vnfs"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: virtual
+            entity: Vnf
+          annotations:
+            summary: "Vnf search is slow"
+        - alert: ITTAHypervisorErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-virtual-service",uri=~"/api/v1/hypervisors.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-virtual-service",uri=~"/api/v1/hypervisors.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: virtual
+            entity: Hypervisor
+          annotations:
+            summary: "Hypervisor API burning error budget"
+            description: "More than 2% of Hypervisor requests failed in the last hour."
+        - alert: ITTAHypervisorSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-virtual-service",uri="/api/v1/hypervisors"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: virtual
+            entity: Hypervisor
+          annotations:
+            summary: "Hypervisor search is slow"
+        - alert: ITTAVirtualMachineErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-virtual-service",uri=~"/api/v1/virtual-machines.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-virtual-service",uri=~"/api/v1/virtual-machines.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: virtual
+            entity: VirtualMachine
+          annotations:
+            summary: "Virtual Machine API burning error budget"
+            description: "More than 2% of Virtual Machine requests failed in the last hour."
+        - alert: ITTAVirtualMachineSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-virtual-service",uri="/api/v1/virtual-machines"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: virtual
+            entity: VirtualMachine
+          annotations:
+            summary: "Virtual Machine search is slow"
+        - alert: ITTACloudAccountErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-virtual-service",uri=~"/api/v1/cloud-accounts.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-virtual-service",uri=~"/api/v1/cloud-accounts.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: virtual
+            entity: CloudAccount
+          annotations:
+            summary: "Cloud Account API burning error budget"
+            description: "More than 2% of Cloud Account requests failed in the last hour."
+        - alert: ITTACloudAccountSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-virtual-service",uri="/api/v1/cloud-accounts"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: virtual
+            entity: CloudAccount
+          annotations:
+            summary: "Cloud Account search is slow"
+        - alert: ITTAK8sClusterErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-virtual-service",uri=~"/api/v1/k8s-clusters.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-virtual-service",uri=~"/api/v1/k8s-clusters.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: virtual
+            entity: K8sCluster
+          annotations:
+            summary: "K8s Cluster API burning error budget"
+            description: "More than 2% of K8s Cluster requests failed in the last hour."
+        - alert: ITTAK8sClusterSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-virtual-service",uri="/api/v1/k8s-clusters"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: virtual
+            entity: K8sCluster
+          annotations:
+            summary: "K8s Cluster search is slow"

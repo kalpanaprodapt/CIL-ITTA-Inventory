@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: inventory-capacity-api-perf
+  namespace: argocd
+  labels:
+    cil.uniti.com/domain: capacity
+    cil.uniti.com/environment: perf
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: itta-inventory-perf
+  source:
+    repoURL: https://dev.azure.com/uniti-cil/CIL/_git/nso-cil-itta-inventory-platform
+    targetRevision: main
+    path: gitops/perf/inventory-capacity-api
+  destination:
+    server: https://aks-cil-perf-cus.hcp.eastus2.azmk8s.io:443
+    namespace: itta-inventory-perf
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
+      - ServerSideApply=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 3m
+  revisionHistoryLimit: 5

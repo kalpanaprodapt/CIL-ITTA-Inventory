@@ -1,0 +1,121 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: itta-alarm-slo
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: itta-alarm-slo
+      rules:
+        - alert: ITTAAlarmDefinitionErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-alarm-service",uri=~"/api/v1/alarm-definitions.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-alarm-service",uri=~"/api/v1/alarm-definitions.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: alarm
+            entity: AlarmDefinition
+          annotations:
+            summary: "Alarm Definition API burning error budget"
+            description: "More than 2% of Alarm Definition requests failed in the last hour."
+        - alert: ITTAAlarmDefinitionSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-alarm-service",uri="/api/v1/alarm-definitions"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: alarm
+            entity: AlarmDefinition
+          annotations:
+            summary: "Alarm Definition search is slow"
+        - alert: ITTAAlarmInstanceErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-alarm-service",uri=~"/api/v1/alarm-instances.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-alarm-service",uri=~"/api/v1/alarm-instances.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: alarm
+            entity: AlarmInstance
+          annotations:
+            summary: "Alarm Instance API burning error budget"
+            description: "More than 2% of Alarm Instance requests failed in the last hour."
+        - alert: ITTAAlarmInstanceSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-alarm-service",uri="/api/v1/alarm-instances"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: alarm
+            entity: AlarmInstance
+          annotations:
+            summary: "Alarm Instance search is slow"
+        - alert: ITTAEventSourceErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-alarm-service",uri=~"/api/v1/event-sources.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-alarm-service",uri=~"/api/v1/event-sources.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: alarm
+            entity: EventSource
+          annotations:
+            summary: "Event Source API burning error budget"
+            description: "More than 2% of Event Source requests failed in the last hour."
+        - alert: ITTAEventSourceSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-alarm-service",uri="/api/v1/event-sources"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: alarm
+            entity: EventSource
+          annotations:
+            summary: "Event Source search is slow"
+        - alert: ITTASuppressionRuleErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-alarm-service",uri=~"/api/v1/suppression-rules.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-alarm-service",uri=~"/api/v1/suppression-rules.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: alarm
+            entity: SuppressionRule
+          annotations:
+            summary: "Suppression Rule API burning error budget"
+            description: "More than 2% of Suppression Rule requests failed in the last hour."
+        - alert: ITTASuppressionRuleSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-alarm-service",uri="/api/v1/suppression-rules"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: alarm
+            entity: SuppressionRule
+          annotations:
+            summary: "Suppression Rule search is slow"
+        - alert: ITTATicketLinkErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-alarm-service",uri=~"/api/v1/ticket-links.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-alarm-service",uri=~"/api/v1/ticket-links.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: alarm
+            entity: TicketLink
+          annotations:
+            summary: "Ticket Link API burning error budget"
+            description: "More than 2% of Ticket Link requests failed in the last hour."
+        - alert: ITTATicketLinkSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-alarm-service",uri="/api/v1/ticket-links"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: alarm
+            entity: TicketLink
+          annotations:
+            summary: "Ticket Link search is slow"

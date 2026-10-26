@@ -1,0 +1,664 @@
+---
+# Source: itta-workload/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: inventory-optical-api
+  namespace: itta-inventory-uat
+  labels:
+    app.kubernetes.io/name: inventory-optical-api
+    app.kubernetes.io/instance: inventory-optical-api-uat
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: optical
+    cil.uniti.com/environment: uat
+  annotations:
+    azure.workload.identity/client-id: "37446284-0000-4000-8000-965305761454"
+    azure.workload.identity/tenant-id: "uniti-cil-tenant"
+automountServiceAccountToken: false
+---
+# Source: itta-workload/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: inventory-optical-api-config
+  namespace: itta-inventory-uat
+  labels:
+    app.kubernetes.io/name: inventory-optical-api
+    app.kubernetes.io/instance: inventory-optical-api-uat
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: optical
+    cil.uniti.com/environment: uat
+data:
+  application-uat.yaml: |
+    itta:
+      domain: optical
+      upstream: http://inventory-optical-service:8080
+      cache:
+        summaries_ttl_seconds: 60
+        item_ttl_seconds: 15
+      entities:
+        - name: OpticalChannel
+          path: /api/v1/optical-channels
+          fields: 15
+        - name: WdmSystem
+          path: /api/v1/wdm-systems
+          fields: 15
+        - name: OtnLink
+          path: /api/v1/otn-links
+          fields: 15
+        - name: Amplifier
+          path: /api/v1/amplifiers
+          fields: 15
+        - name: Roadm
+          path: /api/v1/roadms
+          fields: 15
+      logging:
+        level: INFO
+---
+# Source: itta-workload/templates/secretproviderclass.yaml
+apiVersion: secrets-store.csi.x-k8s.io/v1
+kind: SecretProviderClass
+metadata:
+  name: inventory-optical-api-kv
+  namespace: itta-inventory-uat
+  labels:
+    app.kubernetes.io/name: inventory-optical-api
+    app.kubernetes.io/instance: inventory-optical-api-uat
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: optical
+    cil.uniti.com/environment: uat
+spec:
+  provider: azure
+  parameters:
+    usePodIdentity: "false"
+    clientID: "37446284-0000-4000-8000-965305761454"
+    keyvaultName: kv-cil-itta-uat
+    tenantId: uniti-cil-tenant
+    objects: |
+      array:
+        - |
+          objectName: itta-optical-db-password
+          objectType: secret
+        - |
+          objectName: itta-eventhub-connection
+          objectType: secret
+        - |
+          objectName: itta-aad-client-secret
+          objectType: secret
+  secretObjects:
+    - secretName: inventory-optical-api-secrets
+      type: Opaque
+      data:
+        - objectName: itta-optical-db-password
+          key: db-password
+        - objectName: itta-eventhub-connection
+          key: eventhub-connection
+        - objectName: itta-aad-client-secret
+          key: aad-client-secret
+---
+# Source: itta-workload/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory-optical-api
+  namespace: itta-inventory-uat
+  labels:
+    app.kubernetes.io/name: inventory-optical-api
+    app.kubernetes.io/instance: inventory-optical-api-uat
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: optical
+    cil.uniti.com/environment: uat
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: inventory-optical-api
+    app.kubernetes.io/instance: inventory-optical-api-uat
+---
+# Source: itta-workload/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory-optical-api
+  namespace: itta-inventory-uat
+  labels:
+    app.kubernetes.io/name: inventory-optical-api
+    app.kubernetes.io/instance: inventory-optical-api-uat
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: optical
+    cil.uniti.com/environment: uat
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: inventory-optical-api
+      app.kubernetes.io/instance: inventory-optical-api-uat
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: inventory-optical-api
+        app.kubernetes.io/instance: inventory-optical-api-uat
+        app.kubernetes.io/version: "1.0.0"
+        app.kubernetes.io/component: api
+        app.kubernetes.io/part-of: itta-inventory
+        app.kubernetes.io/managed-by: argocd
+        cil.uniti.com/domain: optical
+        cil.uniti.com/environment: uat
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+        checksum/config: "691437446284"
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+    spec:
+      serviceAccountName: inventory-optical-api
+      terminationGracePeriodSeconds: 45
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: inventory-optical-api
+              app.kubernetes.io/instance: inventory-optical-api-uat
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: inventory-optical-api
+                    app.kubernetes.io/instance: inventory-optical-api-uat
+      containers:
+        - name: inventory-optical-api
+          image: acruniticilitta.azurecr.io/itta/inventory-optical-api:1.0.0-uat
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          env:
+            - name: INVENTORY_OPTICAL_URL
+              value: "http://inventory-optical-service.itta-inventory-uat.svc.cluster.local:8080"
+            - name: ITTA_AUTH_ENFORCED
+              value: "true"
+            - name: ITTA_DEFAULT_TENANT
+              value: "uniti"
+            - name: ITTA_LOG_LEVEL
+              value: "INFO"
+            - name: ITTA_UPSTREAM_TIMEOUT
+              value: "10"
+            - name: ITTA_UPSTREAM_RETRIES
+              value: "2"
+            - name: ITTA_CACHE_ENTRIES
+              value: "10000"
+            - name: ITTA_CORS_ORIGINS
+              value: "https://inventory.uat.cil.uniti.internal"
+            - name: AZURE_AD_AUDIENCE
+              value: "api://itta-inventory"
+            - name: WEB_CONCURRENCY
+              value: "4"
+            - name: INVENTORY_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: inventory-optical-api-secrets
+                  key: db-password
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          envFrom:
+            - configMapRef:
+                name: inventory-optical-api-env
+                optional: true
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 512Mi
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+            failureThreshold: 12
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sh", "-c", "sleep 10"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: config
+              mountPath: /config
+              readOnly: true
+            - name: secrets-store
+              mountPath: /mnt/secrets
+              readOnly: true
+      volumes:
+        - name: tmp
+          emptyDir:
+            sizeLimit: 256Mi
+        - name: config
+          configMap:
+            name: inventory-optical-api-config
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: inventory-optical-api-kv
+---
+# Source: itta-workload/templates/hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: inventory-optical-api
+  namespace: itta-inventory-uat
+  labels:
+    app.kubernetes.io/name: inventory-optical-api
+    app.kubernetes.io/instance: inventory-optical-api-uat
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: optical
+    cil.uniti.com/environment: uat
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: inventory-optical-api
+  minReplicas: 2
+  maxReplicas: 4
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 30
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 60
+---
+# Source: itta-workload/templates/pdb.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: inventory-optical-api
+  namespace: itta-inventory-uat
+  labels:
+    app.kubernetes.io/name: inventory-optical-api
+    app.kubernetes.io/instance: inventory-optical-api-uat
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: optical
+    cil.uniti.com/environment: uat
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: inventory-optical-api
+      app.kubernetes.io/instance: inventory-optical-api-uat
+---
+# Source: itta-workload/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: inventory-optical-api
+  namespace: itta-inventory-uat
+  labels:
+    app.kubernetes.io/name: inventory-optical-api
+    app.kubernetes.io/instance: inventory-optical-api-uat
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: optical
+    cil.uniti.com/environment: uat
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: inventory-optical-api
+      app.kubernetes.io/instance: inventory-optical-api-uat
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: inventory-ui
+              cil.uniti.com/environment: uat
+      ports:
+        - protocol: TCP
+          port: 8000
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: inventory-optical-service
+              cil.uniti.com/environment: uat
+      ports:
+        - protocol: TCP
+          port: 8080
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+      ports:
+        - protocol: TCP
+          port: 443
+---
+# Source: itta-workload/templates/servicemonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: inventory-optical-api
+  namespace: itta-inventory-uat
+  labels:
+    app.kubernetes.io/name: inventory-optical-api
+    app.kubernetes.io/instance: inventory-optical-api-uat
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: optical
+    cil.uniti.com/environment: uat
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: inventory-optical-api
+  namespaceSelector:
+    matchNames:
+      - itta-inventory-uat
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 10s
+      relabelings:
+        - sourceLabels: [__meta_kubernetes_pod_name]
+          targetLabel: pod
+        - targetLabel: environment
+          replacement: uat
+---
+# Source: itta-workload/templates/prometheusrule.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: inventory-optical-api
+  namespace: itta-inventory-uat
+  labels:
+    app.kubernetes.io/name: inventory-optical-api
+    app.kubernetes.io/instance: inventory-optical-api-uat
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: optical
+    cil.uniti.com/environment: uat
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: inventory-optical-api.rules
+      rules:
+        - alert: InventoryOpticalApiHighErrorRate
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-optical-api",status=~"5.."}[5m]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-optical-api"}[5m])) > 0.05
+          for: 10m
+          labels:
+            severity: warning
+            domain: optical
+          annotations:
+            summary: "High 5xx ratio on inventory-optical-api (uat)"
+            runbook_url: "https://wiki.uniti.internal/cil/itta/runbooks/optical"
+        - alert: InventoryOpticalApiPodRestarts
+          expr: increase(kube_pod_container_status_restarts_total{namespace="itta-inventory-uat",pod=~"inventory-optical-api-.*"}[30m]) > 3
+          for: 5m
+          labels:
+            severity: warning
+            domain: optical
+          annotations:
+            summary: "inventory-optical-api pods restarting in uat"
+---
+# Source: itta-workload/templates/cronjob-sync.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: inventory-optical-api-sync
+  namespace: itta-inventory-uat
+  labels:
+    app.kubernetes.io/name: inventory-optical-api
+    app.kubernetes.io/instance: inventory-optical-api-uat
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: optical
+    cil.uniti.com/environment: uat
+    cil.uniti.com/job: reconcile-sync
+spec:
+  schedule: "43 */6 * * *"
+  timeZone: Etc/UTC
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 300
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 5
+  suspend: false
+  jobTemplate:
+    metadata:
+      labels:
+        app.kubernetes.io/name: inventory-optical-api
+        app.kubernetes.io/instance: inventory-optical-api-uat
+        app.kubernetes.io/version: "1.0.0"
+        app.kubernetes.io/component: api
+        app.kubernetes.io/part-of: itta-inventory
+        app.kubernetes.io/managed-by: argocd
+        cil.uniti.com/domain: optical
+        cil.uniti.com/environment: uat
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 1800
+      ttlSecondsAfterFinished: 86400
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: inventory-optical-api
+            app.kubernetes.io/instance: inventory-optical-api-uat
+            app.kubernetes.io/version: "1.0.0"
+            app.kubernetes.io/component: api
+            app.kubernetes.io/part-of: itta-inventory
+            app.kubernetes.io/managed-by: argocd
+            cil.uniti.com/domain: optical
+            cil.uniti.com/environment: uat
+        spec:
+          restartPolicy: Never
+          serviceAccountName: inventory-optical-api
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: sync
+              image: acruniticilitta.azurecr.io/itta/inventory-optical-api:1.0.0-uat
+              imagePullPolicy: IfNotPresent
+              command: ["python", "-m", "itta_core.jobs.reconcile_sync"]
+              args: ["--domain", "optical", "--page-size", "500"]
+              env:
+            - name: INVENTORY_OPTICAL_URL
+              value: "http://inventory-optical-service.itta-inventory-uat.svc.cluster.local:8080"
+            - name: ITTA_AUTH_ENFORCED
+              value: "true"
+            - name: ITTA_DEFAULT_TENANT
+              value: "uniti"
+            - name: ITTA_LOG_LEVEL
+              value: "INFO"
+            - name: ITTA_UPSTREAM_TIMEOUT
+              value: "10"
+            - name: ITTA_UPSTREAM_RETRIES
+              value: "2"
+            - name: ITTA_CACHE_ENTRIES
+              value: "10000"
+            - name: ITTA_CORS_ORIGINS
+              value: "https://inventory.uat.cil.uniti.internal"
+            - name: AZURE_AD_AUDIENCE
+              value: "api://itta-inventory"
+            - name: WEB_CONCURRENCY
+              value: "4"
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 500m
+                  memory: 384Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ["ALL"]
+              volumeMounts:
+                - name: tmp
+                  mountPath: /tmp
+          volumes:
+            - name: tmp
+              emptyDir: {}
+---
+# Source: itta-workload/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: inventory-optical-api
+  namespace: itta-inventory-uat
+  labels:
+    app.kubernetes.io/name: inventory-optical-api
+    app.kubernetes.io/instance: inventory-optical-api-uat
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: itta-inventory
+    app.kubernetes.io/managed-by: argocd
+    cil.uniti.com/domain: optical
+    cil.uniti.com/environment: uat
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-staging
+    nginx.ingress.kubernetes.io/proxy-body-size: 20m
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/enable-cors: "false"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - api-optical.inventory.uat.cil.uniti.internal
+      secretName: inventory-optical-api-tls
+  rules:
+    - host: api-optical.inventory.uat.cil.uniti.internal
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: inventory-optical-api
+                port:
+                  name: http

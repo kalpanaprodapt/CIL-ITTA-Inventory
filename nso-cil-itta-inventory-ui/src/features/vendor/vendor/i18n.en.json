@@ -1,0 +1,41 @@
+{
+  "title": "Vendor",
+  "plural": "Vendors",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "legalName": "Legal Name",
+    "supportEmail": "Support Email",
+    "supportPhone": "Support Phone",
+    "website": "Website",
+    "tier": "Tier",
+    "effectiveFrom": "Effective From",
+    "effectiveTo": "Effective To",
+    "labels": "Labels",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "tier": {
+      "STRATEGIC": "Strategic",
+      "PREFERRED": "Preferred",
+      "APPROVED": "Approved",
+      "BLOCKED": "Blocked"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    }
+  }
+}

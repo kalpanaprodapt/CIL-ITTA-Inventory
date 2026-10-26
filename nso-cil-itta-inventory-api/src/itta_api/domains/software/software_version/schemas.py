@@ -1,0 +1,150 @@
+"""Pydantic models for Software Version (Software and Licensing)."""
+from __future__ import annotations
+
+from datetime import date, datetime
+from decimal import Decimal
+from enum import Enum
+from uuid import UUID
+
+from pydantic import Field, field_validator, model_validator
+
+from itta_core.models import ApiModel, LifecycleStatus, reject_control_chars
+
+
+class SoftwareVersionReleaseTrain(str, Enum):
+    """Allowed values for Software Version Release Train."""
+
+    GA = "GA"
+    MAINTENANCE = "MAINTENANCE"
+    EARLY = "EARLY"
+    DEFERRED = "DEFERRED"
+
+
+class SoftwareVersionCriticality(str, Enum):
+    """Allowed values for Software Version Criticality."""
+
+    LOW = "LOW"
+    MEDIUM = "MEDIUM"
+    HIGH = "HIGH"
+    CRITICAL = "CRITICAL"
+
+
+class SoftwareVersionBase(ApiModel):
+    """Attributes shared by create and read models."""
+
+    code: str = Field(..., max_length=255, min_length=1, description="Code")
+    name: str = Field(..., max_length=255, min_length=1, description="Name")
+    description: str | None = Field(None, max_length=4000, description="Description")
+    status: LifecycleStatus = Field(..., description="Status")
+    external_ref: str | None = Field(None, max_length=255, description="External Ref")
+    image_id: UUID = Field(..., description="Image Id")
+    version_string: str = Field(..., max_length=255, min_length=1, description="Version String")
+    release_date: date | None = Field(None, description="Release Date")
+    end_of_support: date | None = Field(None, description="End Of Support")
+    release_train: SoftwareVersionReleaseTrain | None = Field(None, description="Release Train")
+    cve_count: int | None = Field(None, ge=0, description="Cve Count")
+    region: str | None = Field(None, max_length=255, description="Region")
+    owner: str | None = Field(None, max_length=255, description="Owner")
+    criticality: SoftwareVersionCriticality | None = Field(None, description="Criticality")
+    cost_center: str | None = Field(None, max_length=255, description="Cost Center")
+    notes: str | None = Field(None, max_length=4000, description="Notes")
+
+    @field_validator("code")
+    @classmethod
+    def _check_code(cls, value: str | None) -> str | None:
+        return reject_control_chars(value, "code")
+
+    @field_validator("name")
+    @classmethod
+    def _check_name(cls, value: str | None) -> str | None:
+        return reject_control_chars(value, "name")
+
+    @field_validator("description")
+    @classmethod
+    def _check_description(cls, value: str | None) -> str | None:
+        return reject_control_chars(value, "description")
+
+    @field_validator("external_ref")
+    @classmethod
+    def _check_external_ref(cls, value: str | None) -> str | None:
+        return reject_control_chars(value, "externalRef")
+
+    @field_validator("version_string")
+    @classmethod
+    def _check_version_string(cls, value: str | None) -> str | None:
+        return reject_control_chars(value, "versionString")
+
+    @field_validator("region")
+    @classmethod
+    def _check_region(cls, value: str | None) -> str | None:
+        return reject_control_chars(value, "region")
+
+    @field_validator("owner")
+    @classmethod
+    def _check_owner(cls, value: str | None) -> str | None:
+        return reject_control_chars(value, "owner")
+
+    @field_validator("cost_center")
+    @classmethod
+    def _check_cost_center(cls, value: str | None) -> str | None:
+        return reject_control_chars(value, "costCenter")
+
+    @field_validator("notes")
+    @classmethod
+    def _check_notes(cls, value: str | None) -> str | None:
+        return reject_control_chars(value, "notes")
+
+
+class SoftwareVersionCreate(SoftwareVersionBase):
+    """Payload to create a Software Version."""
+
+
+class SoftwareVersionUpdate(ApiModel):
+    """Partial update; omitted attributes are left unchanged."""
+
+    expected_version: int | None = Field(None, ge=0, description="Optimistic lock version")
+    code: str | None = Field(None, max_length=255, min_length=1, description="Code")
+    name: str | None = Field(None, max_length=255, min_length=1, description="Name")
+    description: str | None = Field(None, max_length=4000, description="Description")
+    status: LifecycleStatus | None = Field(None, description="Status")
+    external_ref: str | None = Field(None, max_length=255, description="External Ref")
+    image_id: UUID | None = Field(None, description="Image Id")
+    version_string: str | None = Field(None, max_length=255, min_length=1, description="Version String")
+    release_date: date | None = Field(None, description="Release Date")
+    end_of_support: date | None = Field(None, description="End Of Support")
+    release_train: SoftwareVersionReleaseTrain | None = Field(None, description="Release Train")
+    cve_count: int | None = Field(None, ge=0, description="Cve Count")
+    region: str | None = Field(None, max_length=255, description="Region")
+    owner: str | None = Field(None, max_length=255, description="Owner")
+    criticality: SoftwareVersionCriticality | None = Field(None, description="Criticality")
+    cost_center: str | None = Field(None, max_length=255, description="Cost Center")
+    notes: str | None = Field(None, max_length=4000, description="Notes")
+
+
+class SoftwareVersionRead(SoftwareVersionBase):
+    """Software Version as returned by the system of record."""
+
+    id: UUID
+    tenant_id: str
+    version: int = 0
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+    created_by: str | None = None
+    updated_by: str | None = None
+
+
+class SoftwareVersionSummary(ApiModel):
+    id: UUID
+    code: str
+    name: str
+    status: LifecycleStatus
+
+
+class SoftwareVersionBulkFailure(ApiModel):
+    index: int
+    message: str
+
+
+class SoftwareVersionBulkResult(ApiModel):
+    succeeded: list[SoftwareVersionRead] = Field(default_factory=list)
+    failures: list[SoftwareVersionBulkFailure] = Field(default_factory=list)

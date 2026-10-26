@@ -1,0 +1,42 @@
+parameters:
+  - name: repoName
+    type: string
+  - name: module
+    type: string
+  - name: sonarProject
+    type: string
+
+steps:
+  - task: JavaToolInstaller@0
+    inputs:
+      versionSpec: '17'
+      jdkArchitectureOption: x64
+      jdkSourceOption: PreInstalled
+  - task: Cache@2
+    inputs:
+      key: 'maven | "$(Agent.OS)" | **/pom.xml'
+      restoreKeys: maven | "$(Agent.OS)"
+      path: $(Pipeline.Workspace)/.m2/repository
+  - task: Maven@4
+    displayName: Build and unit test
+    inputs:
+      mavenPomFile: pom.xml
+      goals: verify
+      options: -B -pl ${{ parameters.module }} -am -Dmaven.repo.local=$(Pipeline.Workspace)/.m2/repository
+      publishJUnitResults: true
+      testResultsFiles: '**/surefire-reports/TEST-*.xml'
+      javaHomeOption: JDKVersion
+      jdkVersionOption: '1.17'
+  - task: PublishCodeCoverageResults@2
+    inputs:
+      summaryFileLocation: '**/target/site/jacoco/jacoco.xml'
+  - task: SonarQubePrepare@6
+    inputs:
+      SonarQube: sc-sonar-cil
+      scannerMode: Other
+      extraProperties: |
+        sonar.projectKey=${{ parameters.sonarProject }}
+  - task: SonarQubeAnalyze@6
+  - task: SonarQubePublish@6
+    inputs:
+      pollingTimeoutSec: '300'

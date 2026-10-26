@@ -1,0 +1,20 @@
+# dev profile overrides
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 5
+  jpa:
+    show-sql: true
+  kafka:
+    producer:
+      properties:
+        linger.ms: 5
+        compression.type: none
+
+inventory:
+  security:
+    enforce-roles: false
+
+logging:
+  level:
+    com.uniti.cil.itta.inventory: DEBUG

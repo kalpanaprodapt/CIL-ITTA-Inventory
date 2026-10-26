@@ -1,0 +1,35 @@
+{
+  "title": "Circuit Segment",
+  "plural": "Circuit Segments",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "circuitId": "Circuit Id",
+    "segmentOrder": "Segment Order",
+    "aTerminationId": "A Termination Id",
+    "zTerminationId": "Z Termination Id",
+    "latencyMs": "Latency Ms",
+    "sourceSystem": "Source System",
+    "region": "Region",
+    "owner": "Owner",
+    "criticality": "Criticality",
+    "costCenter": "Cost Center"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "criticality": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "CRITICAL": "Critical"
+    }
+  }
+}

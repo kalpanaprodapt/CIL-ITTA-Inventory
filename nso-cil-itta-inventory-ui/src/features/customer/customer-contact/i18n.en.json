@@ -1,0 +1,41 @@
+{
+  "title": "Customer Contact",
+  "plural": "Customer Contacts",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "customerId": "Customer Id",
+    "fullName": "Full Name",
+    "email": "Email",
+    "phone": "Phone",
+    "contactRole": "Contact Role",
+    "labels": "Labels",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System",
+    "region": "Region",
+    "owner": "Owner"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "contactRole": {
+      "TECHNICAL": "Technical",
+      "BILLING": "Billing",
+      "ESCALATION": "Escalation",
+      "EXECUTIVE": "Executive"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    }
+  }
+}

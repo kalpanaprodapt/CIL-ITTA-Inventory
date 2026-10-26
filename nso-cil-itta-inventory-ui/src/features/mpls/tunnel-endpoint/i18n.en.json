@@ -1,0 +1,41 @@
+{
+  "title": "Tunnel Endpoint",
+  "plural": "Tunnel Endpoints",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "deviceId": "Device Id",
+    "tunnelName": "Tunnel Name",
+    "tunnelType": "Tunnel Type",
+    "sourceIp": "Source Ip",
+    "destinationIp": "Destination Ip",
+    "effectiveFrom": "Effective From",
+    "effectiveTo": "Effective To",
+    "labels": "Labels",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "tunnelType": {
+      "GRE": "Gre",
+      "IPSEC": "Ipsec",
+      "VXLAN": "Vxlan",
+      "SRV6": "Srv6"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    }
+  }
+}

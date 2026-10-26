@@ -1,0 +1,121 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: itta-port-slo
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: itta-port-slo
+      rules:
+        - alert: ITTAPortErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-port-service",uri=~"/api/v1/ports.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-port-service",uri=~"/api/v1/ports.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: port
+            entity: Port
+          annotations:
+            summary: "Port API burning error budget"
+            description: "More than 2% of Port requests failed in the last hour."
+        - alert: ITTAPortSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-port-service",uri="/api/v1/ports"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: port
+            entity: Port
+          annotations:
+            summary: "Port search is slow"
+        - alert: ITTAInterfaceErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-port-service",uri=~"/api/v1/interfaces.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-port-service",uri=~"/api/v1/interfaces.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: port
+            entity: Interface
+          annotations:
+            summary: "Interface API burning error budget"
+            description: "More than 2% of Interface requests failed in the last hour."
+        - alert: ITTAInterfaceSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-port-service",uri="/api/v1/interfaces"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: port
+            entity: Interface
+          annotations:
+            summary: "Interface search is slow"
+        - alert: ITTASubInterfaceErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-port-service",uri=~"/api/v1/sub-interfaces.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-port-service",uri=~"/api/v1/sub-interfaces.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: port
+            entity: SubInterface
+          annotations:
+            summary: "Sub Interface API burning error budget"
+            description: "More than 2% of Sub Interface requests failed in the last hour."
+        - alert: ITTASubInterfaceSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-port-service",uri="/api/v1/sub-interfaces"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: port
+            entity: SubInterface
+          annotations:
+            summary: "Sub Interface search is slow"
+        - alert: ITTALagGroupErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-port-service",uri=~"/api/v1/lag-groups.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-port-service",uri=~"/api/v1/lag-groups.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: port
+            entity: LagGroup
+          annotations:
+            summary: "Lag Group API burning error budget"
+            description: "More than 2% of Lag Group requests failed in the last hour."
+        - alert: ITTALagGroupSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-port-service",uri="/api/v1/lag-groups"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: port
+            entity: LagGroup
+          annotations:
+            summary: "Lag Group search is slow"
+        - alert: ITTATransceiverErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-port-service",uri=~"/api/v1/transceivers.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-port-service",uri=~"/api/v1/transceivers.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: port
+            entity: Transceiver
+          annotations:
+            summary: "Transceiver API burning error budget"
+            description: "More than 2% of Transceiver requests failed in the last hour."
+        - alert: ITTATransceiverSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-port-service",uri="/api/v1/transceivers"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: port
+            entity: Transceiver
+          annotations:
+            summary: "Transceiver search is slow"

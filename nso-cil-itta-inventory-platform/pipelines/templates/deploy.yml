@@ -1,0 +1,37 @@
+parameters:
+  - name: workload
+    type: string
+  - name: environment
+    type: string
+  - name: cluster
+    type: string
+  - name: namespace
+    type: string
+  - name: serviceConnection
+    type: string
+
+steps:
+  - task: HelmInstaller@1
+    inputs:
+      helmVersionToInstall: 3.15.4
+  - task: Kubernetes@1
+    displayName: Connect to ${{ parameters.cluster }}
+    inputs:
+      connectionType: Kubernetes Service Connection
+      kubernetesServiceEndpoint: ${{ parameters.serviceConnection }}
+      namespace: ${{ parameters.namespace }}
+      command: login
+  - bash: |
+      set -euo pipefail
+      helm lint charts/itta-workload -f helm/values/${{ parameters.environment }}/${{ parameters.workload }}.yaml
+      helm template ${{ parameters.workload }} charts/itta-workload \
+        -f helm/values/${{ parameters.environment }}/${{ parameters.workload }}.yaml \
+        --namespace ${{ parameters.namespace }} > /tmp/rendered.yaml
+      diff -u gitops/${{ parameters.environment }}/${{ parameters.workload }}/manifests.yaml /tmp/rendered.yaml || \
+        { echo "rendered manifests are stale - run scripts/render.sh"; exit 1; }
+    displayName: Validate rendered manifests
+  - bash: |
+      set -euo pipefail
+      argocd app sync ${{ parameters.workload }}-${{ parameters.environment }} --prune --timeout 300
+      argocd app wait ${{ parameters.workload }}-${{ parameters.environment }} --health --timeout 600
+    displayName: Sync and wait for health

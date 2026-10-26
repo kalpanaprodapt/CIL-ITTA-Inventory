@@ -1,0 +1,26 @@
+{
+  "name": "itta-inventory-uat",
+  "type": "Vsts",
+  "variables": {
+    "environment": {
+      "value": "uat"
+    },
+    "namespace": {
+      "value": "itta-inventory-uat"
+    },
+    "aksCluster": {
+      "value": "aks-cil-nonprod-eus2"
+    },
+    "keyVaultName": {
+      "value": "kv-cil-itta-uat"
+    },
+    "argocdToken": {
+      "isSecret": true,
+      "value": null
+    },
+    "sonarToken": {
+      "isSecret": true,
+      "value": null
+    }
+  }
+}

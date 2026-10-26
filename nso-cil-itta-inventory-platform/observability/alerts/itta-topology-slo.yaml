@@ -1,0 +1,121 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: itta-topology-slo
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: itta-topology-slo
+      rules:
+        - alert: ITTALinkErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-topology-service",uri=~"/api/v1/links.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-topology-service",uri=~"/api/v1/links.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: topology
+            entity: Link
+          annotations:
+            summary: "Link API burning error budget"
+            description: "More than 2% of Link requests failed in the last hour."
+        - alert: ITTALinkSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-topology-service",uri="/api/v1/links"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: topology
+            entity: Link
+          annotations:
+            summary: "Link search is slow"
+        - alert: ITTATopologyNodeErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-topology-service",uri=~"/api/v1/topology-nodes.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-topology-service",uri=~"/api/v1/topology-nodes.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: topology
+            entity: TopologyNode
+          annotations:
+            summary: "Topology Node API burning error budget"
+            description: "More than 2% of Topology Node requests failed in the last hour."
+        - alert: ITTATopologyNodeSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-topology-service",uri="/api/v1/topology-nodes"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: topology
+            entity: TopologyNode
+          annotations:
+            summary: "Topology Node search is slow"
+        - alert: ITTATopologyEdgeErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-topology-service",uri=~"/api/v1/topology-edges.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-topology-service",uri=~"/api/v1/topology-edges.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: topology
+            entity: TopologyEdge
+          annotations:
+            summary: "Topology Edge API burning error budget"
+            description: "More than 2% of Topology Edge requests failed in the last hour."
+        - alert: ITTATopologyEdgeSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-topology-service",uri="/api/v1/topology-edges"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: topology
+            entity: TopologyEdge
+          annotations:
+            summary: "Topology Edge search is slow"
+        - alert: ITTATopologyViewErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-topology-service",uri=~"/api/v1/topology-views.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-topology-service",uri=~"/api/v1/topology-views.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: topology
+            entity: TopologyView
+          annotations:
+            summary: "Topology View API burning error budget"
+            description: "More than 2% of Topology View requests failed in the last hour."
+        - alert: ITTATopologyViewSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-topology-service",uri="/api/v1/topology-views"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: topology
+            entity: TopologyView
+          annotations:
+            summary: "Topology View search is slow"
+        - alert: ITTAPathTraceErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-topology-service",uri=~"/api/v1/path-traces.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-topology-service",uri=~"/api/v1/path-traces.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: topology
+            entity: PathTrace
+          annotations:
+            summary: "Path Trace API burning error budget"
+            description: "More than 2% of Path Trace requests failed in the last hour."
+        - alert: ITTAPathTraceSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-topology-service",uri="/api/v1/path-traces"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: topology
+            entity: PathTrace
+          annotations:
+            summary: "Path Trace search is slow"

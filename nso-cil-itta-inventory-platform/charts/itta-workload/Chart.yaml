@@ -1,0 +1,6 @@
+apiVersion: v2
+name: itta-workload
+description: Generic chart for ITTA inventory Spring Boot, FastAPI and UI workloads
+type: application
+version: 1.0.0
+appVersion: "1.0.0"

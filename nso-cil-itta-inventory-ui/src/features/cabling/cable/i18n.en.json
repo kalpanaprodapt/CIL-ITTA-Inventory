@@ -1,0 +1,43 @@
+{
+  "title": "Cable",
+  "plural": "Cables",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "cableType": "Cable Type",
+    "lengthM": "Length M",
+    "aEndPortId": "A End Port Id",
+    "zEndPortId": "Z End Port Id",
+    "color": "Color",
+    "label": "Label",
+    "criticality": "Criticality",
+    "costCenter": "Cost Center",
+    "notes": "Notes",
+    "effectiveFrom": "Effective From",
+    "effectiveTo": "Effective To"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "cableType": {
+      "CAT6": "Cat6",
+      "SM_FIBER": "Sm Fiber",
+      "MM_FIBER": "Mm Fiber",
+      "COAX": "Coax",
+      "DAC": "Dac"
+    },
+    "criticality": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "CRITICAL": "Critical"
+    }
+  }
+}

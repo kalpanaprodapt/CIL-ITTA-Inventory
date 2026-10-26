@@ -1,0 +1,39 @@
+{
+  "title": "Optical Channel",
+  "plural": "Optical Channels",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "wavelengthNm": "Wavelength Nm",
+    "channelNumber": "Channel Number",
+    "gridType": "Grid Type",
+    "bitrateGbps": "Bitrate Gbps",
+    "systemId": "System Id",
+    "criticality": "Criticality",
+    "costCenter": "Cost Center",
+    "notes": "Notes",
+    "effectiveFrom": "Effective From",
+    "effectiveTo": "Effective To"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "gridType": {
+      "FIXED": "Fixed",
+      "FLEX": "Flex"
+    },
+    "criticality": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "CRITICAL": "Critical"
+    }
+  }
+}

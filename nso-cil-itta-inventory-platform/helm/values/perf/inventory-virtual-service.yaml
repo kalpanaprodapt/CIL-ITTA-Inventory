@@ -1,0 +1,88 @@
+# Helm values for inventory-virtual-service in perf
+nameOverride: inventory-virtual-service
+kind: java
+domain: virtual
+environment: perf
+namespace: itta-inventory-perf
+
+image:
+  repository: acruniticilitta.azurecr.io/itta/inventory-virtual-service
+  tag: 1.0.0-perf
+  pullPolicy: IfNotPresent
+
+replicaCount: 3
+
+service:
+  type: ClusterIP
+  port: 8080
+  targetPort: 8080
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 1Gi
+  limits:
+    cpu: 2000m
+    memory: 2Gi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 8
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+probes:
+  startup: /actuator/health/liveness
+  liveness: /actuator/health/liveness
+  readiness: /actuator/health/readiness
+
+env:
+  - name: SPRING_PROFILES_ACTIVE
+    value: "perf"
+  - name: JAVA_TOOL_OPTIONS
+    value: "-XX:MaxRAMPercentage=75 -XX:+ExitOnOutOfMemoryError -Djava.security.egd=file:/dev/urandom"
+  - name: INVENTORY_DB_URL
+    value: "jdbc:postgresql://pg-cil-itta-perf.postgres.database.azure.com:5432/itta_inventory?sslmode=require"
+  - name: INVENTORY_DB_POOL
+    value: "25"
+  - name: KAFKA_BOOTSTRAP
+    value: "evh-cil-itta-perf.servicebus.windows.net:9093"
+  - name: AZURE_AD_ISSUER
+    value: "https://login.microsoftonline.com/uniti-cil/v2.0"
+  - name: AZURE_AD_AUDIENCE
+    value: "api://itta-inventory"
+  - name: DEFAULT_TENANT
+    value: "uniti"
+  - name: LOG_LEVEL
+    value: "WARN"
+  - name: SERVER_PORT
+    value: "8080"
+  - name: MANAGEMENT_SERVER_PORT
+    value: "8080"
+
+ingress:
+  enabled: false
+
+serviceMonitor:
+  enabled: true
+  interval: 30s
+
+workloadIdentity:
+  clientId: "46308838-0000-4000-8000-500834563865"
+
+keyVault:
+  name: kv-cil-itta-perf
+  secrets:
+    - itta-virtual-db-password
+    - itta-eventhub-connection
+    - itta-aad-client-secret
+
+cluster:
+  name: aks-cil-perf-cus
+  region: centralus
+  subscription: sub-cil-perf

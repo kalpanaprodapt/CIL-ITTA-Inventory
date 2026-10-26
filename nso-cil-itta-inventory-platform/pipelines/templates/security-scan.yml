@@ -1,0 +1,14 @@
+parameters:
+  - name: image
+    type: string
+
+steps:
+  - bash: |
+      set -euo pipefail
+      curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.55.2
+      trivy image --severity HIGH,CRITICAL --exit-code 1 --ignore-unfixed ${{ parameters.image }}
+    displayName: Trivy image scan
+  - bash: |
+      docker run --rm -v "$(Build.SourcesDirectory):/src" gitleaks/gitleaks:latest detect --source /src --no-git
+    displayName: Secret scan
+    continueOnError: true

@@ -1,0 +1,41 @@
+{
+  "title": "Alarm Instance",
+  "plural": "Alarm Instances",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "definitionId": "Definition Id",
+    "sourceRef": "Source Ref",
+    "raisedAt": "Raised At",
+    "clearedAt": "Cleared At",
+    "ackedBy": "Acked By",
+    "alarmState": "Alarm State",
+    "effectiveFrom": "Effective From",
+    "effectiveTo": "Effective To",
+    "labels": "Labels",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "alarmState": {
+      "ACTIVE": "Active",
+      "ACKED": "Acked",
+      "CLEARED": "Cleared"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    }
+  }
+}

@@ -1,0 +1,121 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: itta-software-slo
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: itta-software-slo
+      rules:
+        - alert: ITTASoftwareImageErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-software-service",uri=~"/api/v1/software-images.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-software-service",uri=~"/api/v1/software-images.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: software
+            entity: SoftwareImage
+          annotations:
+            summary: "Software Image API burning error budget"
+            description: "More than 2% of Software Image requests failed in the last hour."
+        - alert: ITTASoftwareImageSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-software-service",uri="/api/v1/software-images"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: software
+            entity: SoftwareImage
+          annotations:
+            summary: "Software Image search is slow"
+        - alert: ITTASoftwareVersionErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-software-service",uri=~"/api/v1/software-versions.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-software-service",uri=~"/api/v1/software-versions.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: software
+            entity: SoftwareVersion
+          annotations:
+            summary: "Software Version API burning error budget"
+            description: "More than 2% of Software Version requests failed in the last hour."
+        - alert: ITTASoftwareVersionSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-software-service",uri="/api/v1/software-versions"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: software
+            entity: SoftwareVersion
+          annotations:
+            summary: "Software Version search is slow"
+        - alert: ITTAPatchErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-software-service",uri=~"/api/v1/patchs.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-software-service",uri=~"/api/v1/patchs.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: software
+            entity: Patch
+          annotations:
+            summary: "Patch API burning error budget"
+            description: "More than 2% of Patch requests failed in the last hour."
+        - alert: ITTAPatchSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-software-service",uri="/api/v1/patchs"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: software
+            entity: Patch
+          annotations:
+            summary: "Patch search is slow"
+        - alert: ITTALicenseKeyErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-software-service",uri=~"/api/v1/license-keies.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-software-service",uri=~"/api/v1/license-keies.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: software
+            entity: LicenseKey
+          annotations:
+            summary: "License Key API burning error budget"
+            description: "More than 2% of License Key requests failed in the last hour."
+        - alert: ITTALicenseKeySlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-software-service",uri="/api/v1/license-keies"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: software
+            entity: LicenseKey
+          annotations:
+            summary: "License Key search is slow"
+        - alert: ITTALicensePoolErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-software-service",uri=~"/api/v1/license-pools.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-software-service",uri=~"/api/v1/license-pools.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: software
+            entity: LicensePool
+          annotations:
+            summary: "License Pool API burning error budget"
+            description: "More than 2% of License Pool requests failed in the last hour."
+        - alert: ITTALicensePoolSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-software-service",uri="/api/v1/license-pools"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: software
+            entity: LicensePool
+          annotations:
+            summary: "License Pool search is slow"

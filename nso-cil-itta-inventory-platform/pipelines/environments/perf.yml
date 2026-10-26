@@ -1,0 +1,14 @@
+# Variable template for perf
+variables:
+  environment: perf
+  namespace: itta-inventory-perf
+  cluster: aks-cil-perf-cus
+  region: centralus
+  subscription: sub-cil-perf
+  keyVault: kv-cil-itta-perf
+  acr: acruniticilitta.azurecr.io
+  argocdServer: argocd.perf.cil.uniti.internal
+  smokeBaseDomain: inventory.perf.cil.uniti.internal
+  replicaFloor: 3
+  replicaCeiling: 8
+  approvalGroup: cil-itta-perf-approvers

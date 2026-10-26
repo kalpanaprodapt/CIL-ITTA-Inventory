@@ -1,0 +1,90 @@
+# Helm values for inventory-topology-api in uat
+nameOverride: inventory-topology-api
+kind: python
+domain: topology
+environment: uat
+namespace: itta-inventory-uat
+
+image:
+  repository: acruniticilitta.azurecr.io/itta/inventory-topology-api
+  tag: 1.0.0-uat
+  pullPolicy: IfNotPresent
+
+replicaCount: 2
+
+service:
+  type: ClusterIP
+  port: 8080
+  targetPort: 8000
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 1000m
+    memory: 512Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 4
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+probes:
+  startup: /healthz
+  liveness: /healthz
+  readiness: /readyz
+
+env:
+  - name: INVENTORY_TOPOLOGY_URL
+    value: "http://inventory-topology-service.itta-inventory-uat.svc.cluster.local:8080"
+  - name: ITTA_AUTH_ENFORCED
+    value: "true"
+  - name: ITTA_DEFAULT_TENANT
+    value: "uniti"
+  - name: ITTA_LOG_LEVEL
+    value: "INFO"
+  - name: ITTA_UPSTREAM_TIMEOUT
+    value: "10"
+  - name: ITTA_UPSTREAM_RETRIES
+    value: "2"
+  - name: ITTA_CACHE_ENTRIES
+    value: "10000"
+  - name: ITTA_CORS_ORIGINS
+    value: "https://inventory.uat.cil.uniti.internal"
+  - name: AZURE_AD_AUDIENCE
+    value: "api://itta-inventory"
+  - name: WEB_CONCURRENCY
+    value: "4"
+
+ingress:
+  enabled: true
+  className: nginx
+  host: api-topology.inventory.uat.cil.uniti.internal
+  tlsSecret: inventory-topology-api-tls
+  clusterIssuer: letsencrypt-staging
+
+serviceMonitor:
+  enabled: true
+  interval: 30s
+
+workloadIdentity:
+  clientId: "07734669-0000-4000-8000-530341930988"
+
+keyVault:
+  name: kv-cil-itta-uat
+  secrets:
+    - itta-topology-db-password
+    - itta-eventhub-connection
+    - itta-aad-client-secret
+
+cluster:
+  name: aks-cil-nonprod-eus2
+  region: eastus2
+  subscription: sub-cil-nonprod

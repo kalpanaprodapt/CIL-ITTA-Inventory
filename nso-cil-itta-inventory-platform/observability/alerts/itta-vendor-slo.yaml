@@ -1,0 +1,121 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: itta-vendor-slo
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: itta-vendor-slo
+      rules:
+        - alert: ITTAVendorErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-vendor-service",uri=~"/api/v1/vendors.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-vendor-service",uri=~"/api/v1/vendors.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: vendor
+            entity: Vendor
+          annotations:
+            summary: "Vendor API burning error budget"
+            description: "More than 2% of Vendor requests failed in the last hour."
+        - alert: ITTAVendorSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-vendor-service",uri="/api/v1/vendors"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: vendor
+            entity: Vendor
+          annotations:
+            summary: "Vendor search is slow"
+        - alert: ITTAHardwareModelErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-vendor-service",uri=~"/api/v1/hardware-models.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-vendor-service",uri=~"/api/v1/hardware-models.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: vendor
+            entity: HardwareModel
+          annotations:
+            summary: "Hardware Model API burning error budget"
+            description: "More than 2% of Hardware Model requests failed in the last hour."
+        - alert: ITTAHardwareModelSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-vendor-service",uri="/api/v1/hardware-models"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: vendor
+            entity: HardwareModel
+          annotations:
+            summary: "Hardware Model search is slow"
+        - alert: ITTASkuErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-vendor-service",uri=~"/api/v1/skus.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-vendor-service",uri=~"/api/v1/skus.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: vendor
+            entity: Sku
+          annotations:
+            summary: "Sku API burning error budget"
+            description: "More than 2% of Sku requests failed in the last hour."
+        - alert: ITTASkuSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-vendor-service",uri="/api/v1/skus"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: vendor
+            entity: Sku
+          annotations:
+            summary: "Sku search is slow"
+        - alert: ITTASupportContractErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-vendor-service",uri=~"/api/v1/support-contracts.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-vendor-service",uri=~"/api/v1/support-contracts.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: vendor
+            entity: SupportContract
+          annotations:
+            summary: "Support Contract API burning error budget"
+            description: "More than 2% of Support Contract requests failed in the last hour."
+        - alert: ITTASupportContractSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-vendor-service",uri="/api/v1/support-contracts"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: vendor
+            entity: SupportContract
+          annotations:
+            summary: "Support Contract search is slow"
+        - alert: ITTAWarrantyErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-vendor-service",uri=~"/api/v1/warranties.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-vendor-service",uri=~"/api/v1/warranties.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: vendor
+            entity: Warranty
+          annotations:
+            summary: "Warranty API burning error budget"
+            description: "More than 2% of Warranty requests failed in the last hour."
+        - alert: ITTAWarrantySlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-vendor-service",uri="/api/v1/warranties"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: vendor
+            entity: Warranty
+          annotations:
+            summary: "Warranty search is slow"

@@ -1,0 +1,26 @@
+{
+  "name": "itta-inventory-perf",
+  "type": "Vsts",
+  "variables": {
+    "environment": {
+      "value": "perf"
+    },
+    "namespace": {
+      "value": "itta-inventory-perf"
+    },
+    "aksCluster": {
+      "value": "aks-cil-perf-cus"
+    },
+    "keyVaultName": {
+      "value": "kv-cil-itta-perf"
+    },
+    "argocdToken": {
+      "isSecret": true,
+      "value": null
+    },
+    "sonarToken": {
+      "isSecret": true,
+      "value": null
+    }
+  }
+}

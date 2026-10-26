@@ -1,0 +1,41 @@
+{
+  "title": "Vlan",
+  "plural": "Vlans",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "vlanId": "Vlan Id",
+    "vlanName": "Vlan Name",
+    "vlanType": "Vlan Type",
+    "poolId": "Pool Id",
+    "stpMode": "Stp Mode",
+    "notes": "Notes",
+    "effectiveFrom": "Effective From",
+    "effectiveTo": "Effective To",
+    "labels": "Labels",
+    "lifecycleStage": "Lifecycle Stage"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "vlanType": {
+      "DATA": "Data",
+      "VOICE": "Voice",
+      "MGMT": "Mgmt",
+      "NATIVE": "Native"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    }
+  }
+}

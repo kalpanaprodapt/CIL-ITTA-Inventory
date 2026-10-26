@@ -1,0 +1,45 @@
+{
+  "title": "Site",
+  "plural": "Sites",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "cityId": "City Id",
+    "siteType": "Site Type",
+    "address": "Address",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "powerKw": "Power Kw",
+    "accessHours": "Access Hours",
+    "effectiveTo": "Effective To",
+    "labels": "Labels",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System",
+    "region": "Region"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "siteType": {
+      "CO": "Co",
+      "POP": "Pop",
+      "DATACENTER": "Datacenter",
+      "HUT": "Hut",
+      "CELL_SITE": "Cell Site",
+      "CUSTOMER_PREMISE": "Customer Premise"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    }
+  }
+}

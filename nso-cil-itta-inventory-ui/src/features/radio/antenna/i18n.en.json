@@ -1,0 +1,36 @@
+{
+  "title": "Antenna",
+  "plural": "Antennas",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "sectorId": "Sector Id",
+    "model": "Model",
+    "heightM": "Height M",
+    "azimuthDeg": "Azimuth Deg",
+    "tiltDeg": "Tilt Deg",
+    "gainDbi": "Gain Dbi",
+    "sourceSystem": "Source System",
+    "region": "Region",
+    "owner": "Owner",
+    "criticality": "Criticality",
+    "costCenter": "Cost Center"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "criticality": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "CRITICAL": "Critical"
+    }
+  }
+}

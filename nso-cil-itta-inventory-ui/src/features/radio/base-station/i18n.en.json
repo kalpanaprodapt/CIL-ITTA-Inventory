@@ -1,0 +1,41 @@
+{
+  "title": "Base Station",
+  "plural": "Base Stations",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "siteId": "Site Id",
+    "enbId": "Enb Id",
+    "technology": "Technology",
+    "sectorCount": "Sector Count",
+    "cellCount": "Cell Count",
+    "labels": "Labels",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System",
+    "region": "Region",
+    "owner": "Owner"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "technology": {
+      "LTE": "Lte",
+      "NR": "Nr",
+      "GSM": "Gsm",
+      "UMTS": "Umts"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "title": "Compliance Check",
+  "plural": "Compliance Checks",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "ruleId": "Rule Id",
+    "targetRef": "Target Ref",
+    "checkedAt": "Checked At",
+    "result": "Result",
+    "evidence": "Evidence",
+    "criticality": "Criticality",
+    "costCenter": "Cost Center",
+    "notes": "Notes",
+    "effectiveFrom": "Effective From",
+    "effectiveTo": "Effective To"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "result": {
+      "PASS": "Pass",
+      "FAIL": "Fail",
+      "WARN": "Warn",
+      "NA": "Na"
+    },
+    "criticality": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "CRITICAL": "Critical"
+    }
+  }
+}

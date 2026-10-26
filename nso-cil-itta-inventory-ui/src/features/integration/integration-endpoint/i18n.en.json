@@ -1,0 +1,41 @@
+{
+  "title": "Integration Endpoint",
+  "plural": "Integration Endpoints",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "endpointName": "Endpoint Name",
+    "targetSystem": "Target System",
+    "baseUrl": "Base Url",
+    "authType": "Auth Type",
+    "timeoutMs": "Timeout Ms",
+    "sourceSystem": "Source System",
+    "region": "Region",
+    "owner": "Owner",
+    "criticality": "Criticality",
+    "costCenter": "Cost Center"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "authType": {
+      "BASIC": "Basic",
+      "OAUTH2": "Oauth2",
+      "MTLS": "Mtls",
+      "API_KEY": "Api Key"
+    },
+    "criticality": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "CRITICAL": "Critical"
+    }
+  }
+}

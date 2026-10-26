@@ -1,0 +1,17 @@
+parameters:
+  - name: workload
+    type: string
+  - name: baseUrl
+    type: string
+
+steps:
+  - bash: |
+      set -euo pipefail
+      for path in /healthz /actuator/health/readiness; do
+        code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "${{ parameters.baseUrl }}$path" || true)
+        echo "$path -> $code"
+        if [ "$code" = "200" ]; then exit 0; fi
+      done
+      echo "smoke test failed for ${{ parameters.workload }}"
+      exit 1
+    displayName: Smoke test ${{ parameters.workload }}

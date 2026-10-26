@@ -1,0 +1,121 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: itta-capacity-slo
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: itta-capacity-slo
+      rules:
+        - alert: ITTACapacityPlanErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-capacity-service",uri=~"/api/v1/capacity-plans.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-capacity-service",uri=~"/api/v1/capacity-plans.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: capacity
+            entity: CapacityPlan
+          annotations:
+            summary: "Capacity Plan API burning error budget"
+            description: "More than 2% of Capacity Plan requests failed in the last hour."
+        - alert: ITTACapacityPlanSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-capacity-service",uri="/api/v1/capacity-plans"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: capacity
+            entity: CapacityPlan
+          annotations:
+            summary: "Capacity Plan search is slow"
+        - alert: ITTAUtilizationSampleErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-capacity-service",uri=~"/api/v1/utilization-samples.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-capacity-service",uri=~"/api/v1/utilization-samples.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: capacity
+            entity: UtilizationSample
+          annotations:
+            summary: "Utilization Sample API burning error budget"
+            description: "More than 2% of Utilization Sample requests failed in the last hour."
+        - alert: ITTAUtilizationSampleSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-capacity-service",uri="/api/v1/utilization-samples"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: capacity
+            entity: UtilizationSample
+          annotations:
+            summary: "Utilization Sample search is slow"
+        - alert: ITTAThresholdPolicyErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-capacity-service",uri=~"/api/v1/threshold-policies.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-capacity-service",uri=~"/api/v1/threshold-policies.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: capacity
+            entity: ThresholdPolicy
+          annotations:
+            summary: "Threshold Policy API burning error budget"
+            description: "More than 2% of Threshold Policy requests failed in the last hour."
+        - alert: ITTAThresholdPolicySlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-capacity-service",uri="/api/v1/threshold-policies"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: capacity
+            entity: ThresholdPolicy
+          annotations:
+            summary: "Threshold Policy search is slow"
+        - alert: ITTAForecastModelErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-capacity-service",uri=~"/api/v1/forecast-models.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-capacity-service",uri=~"/api/v1/forecast-models.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: capacity
+            entity: ForecastModel
+          annotations:
+            summary: "Forecast Model API burning error budget"
+            description: "More than 2% of Forecast Model requests failed in the last hour."
+        - alert: ITTAForecastModelSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-capacity-service",uri="/api/v1/forecast-models"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: capacity
+            entity: ForecastModel
+          annotations:
+            summary: "Forecast Model search is slow"
+        - alert: ITTAReservationErrorBudgetBurn
+          expr: |
+            sum(rate(http_server_requests_seconds_count{service="inventory-capacity-service",uri=~"/api/v1/reservations.*",status=~"5.."}[1h]))
+              / sum(rate(http_server_requests_seconds_count{service="inventory-capacity-service",uri=~"/api/v1/reservations.*"}[1h])) > 0.02
+          for: 15m
+          labels:
+            severity: warning
+            domain: capacity
+            entity: Reservation
+          annotations:
+            summary: "Reservation API burning error budget"
+            description: "More than 2% of Reservation requests failed in the last hour."
+        - alert: ITTAReservationSlowSearch
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{service="inventory-capacity-service",uri="/api/v1/reservations"}[10m])) by (le)) > 2
+          for: 20m
+          labels:
+            severity: warning
+            domain: capacity
+            entity: Reservation
+          annotations:
+            summary: "Reservation search is slow"

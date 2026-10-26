@@ -1,0 +1,41 @@
+{
+  "title": "Radio Unit",
+  "plural": "Radio Units",
+  "fields": {
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "externalRef": "External Ref",
+    "siteId": "Site Id",
+    "unitType": "Unit Type",
+    "bandMhz": "Band Mhz",
+    "txPowerDbm": "Tx Power Dbm",
+    "serialNumber": "Serial Number",
+    "effectiveFrom": "Effective From",
+    "effectiveTo": "Effective To",
+    "labels": "Labels",
+    "lifecycleStage": "Lifecycle Stage",
+    "sourceSystem": "Source System"
+  },
+  "enums": {
+    "status": {
+      "PLANNED": "Planned",
+      "ACTIVE": "Active",
+      "MAINTENANCE": "Maintenance",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "unitType": {
+      "RRU": "Rru",
+      "AAU": "Aau",
+      "MICROWAVE": "Microwave",
+      "SMALL_CELL": "Small Cell"
+    },
+    "lifecycleStage": {
+      "PLAN": "Plan",
+      "BUILD": "Build",
+      "OPERATE": "Operate",
+      "RETIRE": "Retire"
+    }
+  }
+}
